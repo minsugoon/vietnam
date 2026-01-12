@@ -84,6 +84,33 @@
       font-weight:700;
     }
 
+    /* 구글 사진 번역 버튼 */
+    .top-actions{
+      padding:0 6px 2px 6px;
+    }
+    .photo-btn{
+      width:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:14px 14px;
+      border-radius:18px;
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, var(--card), var(--card2));
+      color:var(--text);
+      font-size:16px;
+      font-weight:1000;
+      cursor:pointer;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+    }
+    .photo-btn:active{transform:translateY(1px)}
+    .photo-btn .small{
+      font-size:12px;
+      font-weight:800;
+      color:var(--muted);
+    }
+
     .tabs{
       display:flex;
       gap:10px;
@@ -246,7 +273,7 @@
 
     .vi{
       margin-top:10px;
-      font-size:38px; /* 기본 크게 */
+      font-size:38px;
       font-weight:1100;
       line-height:1.12;
       letter-spacing:-0.2px;
@@ -257,7 +284,7 @@
       font-weight:950;
       color: color-mix(in srgb, var(--text), transparent 8%);
     }
-    .pron{
+    .enpron{
       margin-top:10px;
       font-size:16px;
       font-weight:950;
@@ -335,13 +362,22 @@
       </div>
     </header>
 
+    <!-- 구글 사진 번역 버튼(추가) -->
+    <div class="top-actions">
+      <button class="photo-btn" id="photoTranslateBtn" type="button">
+        📷 구글 사진 번역 열기
+        <span class="small">(메뉴/표지판 촬영)</span>
+      </button>
+    </div>
+
     <div class="tabs" id="tabs"></div>
 
     <main>
       <div class="grid" id="grid"></div>
       <div class="note" style="padding:0 6px;">
         • ⭐ 즐겨찾기: 목록의 별(⭐)을 눌러 저장하거나, 문장 화면에서 저장할 수 있습니다.<br>
-        • 🔊 음성: 기기/브라우저가 베트남어 음성을 지원할 때만 재생됩니다.
+        • 🔊 음성: 기기/브라우저가 베트남어 음성을 지원할 때만 재생됩니다.<br>
+        • 📷 사진 번역: 구글 번역/렌즈 화면으로 이동합니다(인터넷 필요).
       </div>
     </main>
   </div>
@@ -363,7 +399,7 @@
         <div class="card">
           <div class="label">베트남어 (상대에게 보여주기)</div>
           <div class="vi" id="mVi"></div>
-          <div class="pron" id="mPron"></div>
+          <div class="enpron" id="mEnPron"></div>
           <div class="en" id="mEn"></div>
         </div>
 
@@ -396,89 +432,89 @@
     { key:"help", icon:"🆘", name:"긴급" }
   ];
 
-  // 문장 데이터 + 베트남어 발음(한국어)
-  // ※ 발음은 '대충 읽기' 수준의 안내입니다(지역/억양에 따라 다를 수 있음).
+  // 문장 데이터
+  // enPron: 영어 발음(한국어 표기) - '대충 읽기' 수준의 안내입니다.
   const PHRASES = [
     // 인사
-    {cat:"greet", ko:"안녕하세요.", vi:"Xin chào.", pron:"씬 짜오", en:"Hello."},
-    {cat:"greet", ko:"감사합니다.", vi:"Cảm ơn.", pron:"깜 언", en:"Thank you."},
-    {cat:"greet", ko:"죄송합니다.", vi:"Xin lỗi.", pron:"씬 로이", en:"Sorry / Excuse me."},
-    {cat:"greet", ko:"좋은 하루 되세요.", vi:"Chúc bạn một ngày tốt lành.", pron:"축 반 못 응아이 똣 란", en:"Have a nice day."},
-    {cat:"greet", ko:"도와주셔서 감사합니다.", vi:"Cảm ơn bạn đã giúp tôi.", pron:"깜 언 반 다 줍 또이", en:"Thank you for helping me."},
+    {cat:"greet", ko:"안녕하세요.", vi:"Xin chào.", en:"Hello.", enPron:"헬로"},
+    {cat:"greet", ko:"감사합니다.", vi:"Cảm ơn.", en:"Thank you.", enPron:"땡큐"},
+    {cat:"greet", ko:"죄송합니다.", vi:"Xin lỗi.", en:"Sorry / Excuse me.", enPron:"쏘리 / 익스큐즈 미"},
+    {cat:"greet", ko:"좋은 하루 되세요.", vi:"Chúc bạn một ngày tốt lành.", en:"Have a nice day.", enPron:"해브 어 나이스 데이"},
+    {cat:"greet", ko:"도와주셔서 감사합니다.", vi:"Cảm ơn bạn đã giúp tôi.", en:"Thank you for helping me.", enPron:"땡큐 포 헬핑 미"},
 
     // 기본
-    {cat:"basic", ko:"한국 사람입니다.", vi:"Tôi là người Hàn Quốc.", pron:"또이 라 응우어이 한 꾸옥", en:"I’m Korean."},
-    {cat:"basic", ko:"영어/베트남어를 못합니다. 천천히 말해 주세요.", vi:"Tôi không nói được tiếng Anh/tiếng Việt. Vui lòng nói chậm.", pron:"또이 콩 노이 득 띠엥 아인/띠엥 비엣. 부이 롱 노이 짬", en:"I can’t speak English/Vietnamese. Please speak slowly."},
-    {cat:"basic", ko:"다시 한 번 말해 주세요.", vi:"Vui lòng nói lại.", pron:"부이 롱 노이 라이", en:"Please say it again."},
-    {cat:"basic", ko:"이걸로 괜찮나요?", vi:"Như vậy được không?", pron:"느 바이 득 콩", en:"Is this okay?"},
-    {cat:"basic", ko:"화장실은 어디입니까?", vi:"Nhà vệ sinh ở đâu?", pron:"냐 베 씽 어 다우", en:"Where is the restroom?"},
-    {cat:"basic", ko:"여기 좀 도와주세요.", vi:"Giúp tôi với, làm ơn.", pron:"줍 또이 버이, 람 언", en:"Please help me here."},
-    {cat:"basic", ko:"사진 찍어주실 수 있나요?", vi:"Bạn có thể chụp ảnh giúp tôi không?", pron:"반 꺼 테 츱 아인 줍 또이 콩", en:"Could you take a photo for me?"},
-    {cat:"basic", ko:"이 주소로 가고 싶습니다.", vi:"Tôi muốn đến địa chỉ này.", pron:"또이 무온 덴 디아 찌 나이", en:"I want to go to this address."},
+    {cat:"basic", ko:"한국 사람입니다.", vi:"Tôi là người Hàn Quốc.", en:"I’m Korean.", enPron:"아임 코리언"},
+    {cat:"basic", ko:"영어/베트남어를 못합니다. 천천히 말해 주세요.", vi:"Tôi không nói được tiếng Anh/tiếng Việt. Vui lòng nói chậm.", en:"I can’t speak English/Vietnamese. Please speak slowly.", enPron:"아이 캔트 스피크 잉글리시/비에트나미즈. 플리즈 스피크 슬로울리"},
+    {cat:"basic", ko:"다시 한 번 말해 주세요.", vi:"Vui lòng nói lại.", en:"Please say it again.", enPron:"플리즈 세이 잇 어게인"},
+    {cat:"basic", ko:"이걸로 괜찮나요?", vi:"Như vậy được không?", en:"Is this okay?", enPron:"이즈 디스 오케이?"},
+    {cat:"basic", ko:"화장실은 어디입니까?", vi:"Nhà vệ sinh ở đâu?", en:"Where is the restroom?", enPron:"웨어 이즈 더 레스트룸?"},
+    {cat:"basic", ko:"여기 좀 도와주세요.", vi:"Giúp tôi với, làm ơn.", en:"Please help me here.", enPron:"플리즈 헬프 미 히어"},
+    {cat:"basic", ko:"사진 찍어주실 수 있나요?", vi:"Bạn có thể chụp ảnh giúp tôi không?", en:"Could you take a photo for me?", enPron:"쿠드 유 테이크 어 포토 포 미?"},
+    {cat:"basic", ko:"이 주소로 가고 싶습니다.", vi:"Tôi muốn đến địa chỉ này.", en:"I want to go to this address.", enPron:"아이 원트 투 고 투 디스 어드레스"},
 
     // 공항
-    {cat:"airport", ko:"출국장(체크인)은 어디입니까?", vi:"Khu làm thủ tục (check-in) ở đâu?", pron:"쿠 람 투 툭 (체크인) 어 다우", en:"Where is the check-in area?"},
-    {cat:"airport", ko:"수하물 찾는 곳은 어디입니까?", vi:"Khu nhận hành lý ở đâu?", pron:"쿠 년 하잉 리 어 다우", en:"Where is baggage claim?"},
-    {cat:"airport", ko:"환전소는 어디입니까?", vi:"Quầy đổi tiền ở đâu?", pron:"꿰이 도이 띠엔 어 다우", en:"Where is the currency exchange?"},
-    {cat:"airport", ko:"택시 타는 곳은 어디입니까?", vi:"Chỗ bắt taxi ở đâu?", pron:"쪼 밧 탁시 어 다우", en:"Where can I get a taxi?"},
-    {cat:"airport", ko:"이 항공편이 맞나요? 확인해주세요.", vi:"Đây có đúng chuyến bay không? Vui lòng kiểm tra.", pron:"다이 꺼 둥 추옌 바이 콩? 부이 롱 끼엠 짜", en:"Is this the right flight? Please check."},
+    {cat:"airport", ko:"출국장(체크인)은 어디입니까?", vi:"Khu làm thủ tục (check-in) ở đâu?", en:"Where is the check-in area?", enPron:"웨어 이즈 더 체크인 에어리어?"},
+    {cat:"airport", ko:"수하물 찾는 곳은 어디입니까?", vi:"Khu nhận hành lý ở đâu?", en:"Where is baggage claim?", enPron:"웨어 이즈 배기지 클레임?"},
+    {cat:"airport", ko:"환전소는 어디입니까?", vi:"Quầy đổi tiền ở đâu?", en:"Where is the currency exchange?", enPron:"웨어 이즈 더 커런시 익스체인지?"},
+    {cat:"airport", ko:"택시 타는 곳은 어디입니까?", vi:"Chỗ bắt taxi ở đâu?", en:"Where can I get a taxi?", enPron:"웨어 캔 아이 겟 어 택시?"},
+    {cat:"airport", ko:"이 항공편이 맞나요? 확인해주세요.", vi:"Đây có đúng chuyến bay không? Vui lòng kiểm tra.", en:"Is this the right flight? Please check.", enPron:"이즈 디스 더 라이트 플라이트? 플리즈 체크"},
 
     // 숙소/예약
-    {cat:"hotel", ko:"예약했습니다. 확인해주세요.", vi:"Tôi đã đặt phòng. Vui lòng kiểm tra giúp tôi.", pron:"또이 다 닷 퐁. 부이 롱 끼엠 짜 줍 또이", en:"I have a reservation. Please check."},
-    {cat:"hotel", ko:"체크인하고 싶습니다.", vi:"Tôi muốn làm thủ tục nhận phòng.", pron:"또이 무온 람 투 툭 년 퐁", en:"I’d like to check in."},
-    {cat:"hotel", ko:"체크아웃하고 싶습니다.", vi:"Tôi muốn trả phòng.", pron:"또이 무온 짜 퐁", en:"I’d like to check out."},
-    {cat:"hotel", ko:"방 키가 안 됩니다.", vi:"Thẻ phòng không dùng được.", pron:"테 퐁 콩 중 득", en:"The room key card doesn’t work."},
-    {cat:"hotel", ko:"와이파이 비밀번호가 무엇입니까?", vi:"Mật khẩu Wi-Fi là gì?", pron:"멋 커우 와이파이 라 지", en:"What is the Wi-Fi password?"},
-    {cat:"hotel", ko:"수건을 더 주세요.", vi:"Cho tôi thêm khăn tắm, làm ơn.", pron:"쪼 또이 템 컨 땀, 람 언", en:"Please give me more towels."},
-    {cat:"hotel", ko:"방 청소 부탁드립니다.", vi:"Vui lòng dọn phòng giúp tôi.", pron:"부이 롱 존 퐁 줍 또이", en:"Please clean the room."},
-    {cat:"hotel", ko:"에어컨이 작동하지 않습니다.", vi:"Máy lạnh không hoạt động.", pron:"마이 라잉 콩 홋 동", en:"The air conditioner doesn’t work."},
+    {cat:"hotel", ko:"예약했습니다. 확인해주세요.", vi:"Tôi đã đặt phòng. Vui lòng kiểm tra giúp tôi.", en:"I have a reservation. Please check.", enPron:"아이 해브 어 레저베이션. 플리즈 체크"},
+    {cat:"hotel", ko:"체크인하고 싶습니다.", vi:"Tôi muốn làm thủ tục nhận phòng.", en:"I’d like to check in.", enPron:"아이드 라이크 투 체크인"},
+    {cat:"hotel", ko:"체크아웃하고 싶습니다.", vi:"Tôi muốn trả phòng.", en:"I’d like to check out.", enPron:"아이드 라이크 투 체크아웃"},
+    {cat:"hotel", ko:"방 키가 안 됩니다.", vi:"Thẻ phòng không dùng được.", en:"The room key card doesn’t work.", enPron:"더 룸 키 카드 더즌트 워크"},
+    {cat:"hotel", ko:"와이파이 비밀번호가 무엇입니까?", vi:"Mật khẩu Wi-Fi là gì?", en:"What is the Wi-Fi password?", enPron:"왓 이즈 더 와이파이 패스워드?"},
+    {cat:"hotel", ko:"수건을 더 주세요.", vi:"Cho tôi thêm khăn tắm, làm ơn.", en:"Please give me more towels.", enPron:"플리즈 기브 미 모어 타월즈"},
+    {cat:"hotel", ko:"방 청소 부탁드립니다.", vi:"Vui lòng dọn phòng giúp tôi.", en:"Please clean the room.", enPron:"플리즈 클린 더 룸"},
+    {cat:"hotel", ko:"에어컨이 작동하지 않습니다.", vi:"Máy lạnh không hoạt động.", en:"The air conditioner doesn’t work.", enPron:"디 에어 컨디셔너 더즌트 워크"},
 
     // 교통
-    {cat:"transport", ko:"공항으로 가주세요.", vi:"Làm ơn đưa tôi đến sân bay.", pron:"람 언 드어 또이 덴 선 바이", en:"Please take me to the airport."},
-    {cat:"transport", ko:"호텔(리조트)로 가주세요.", vi:"Làm ơn đưa tôi đến khách sạn / khu nghỉ dưỡng.", pron:"람 언 드어 또이 덴 캇 산 / 쿠 응이 즈엉", en:"Please take me to the hotel / resort."},
-    {cat:"transport", ko:"여기에서 내려주세요.", vi:"Cho tôi xuống ở đây.", pron:"쪼 또이 쑤옹 어 다이", en:"Please drop me off here."},
-    {cat:"transport", ko:"천천히 가주세요.", vi:"Đi chậm thôi.", pron:"디 짬 토이", en:"Please go slowly."},
-    {cat:"transport", ko:"미터기를 켜주세요.", vi:"Vui lòng bật đồng hồ tính tiền.", pron:"부이 롱 벗 동 호 띤 띠엔", en:"Please turn on the meter."},
-    {cat:"transport", ko:"얼마나 걸리나요?", vi:"Mất bao lâu?", pron:"멋 바오 러우", en:"How long will it take?"},
-    {cat:"transport", ko:"여기가 맞나요?", vi:"Đúng chỗ này không?", pron:"둥 쪼 나이 콩", en:"Is this the right place?"},
-    {cat:"transport", ko:"정지해 주세요.", vi:"Dừng lại, làm ơn.", pron:"증 라이, 람 언", en:"Please stop."},
+    {cat:"transport", ko:"공항으로 가주세요.", vi:"Làm ơn đưa tôi đến sân bay.", en:"Please take me to the airport.", enPron:"플리즈 테이크 미 투 디 에어포트"},
+    {cat:"transport", ko:"호텔(리조트)로 가주세요.", vi:"Làm ơn đưa tôi đến khách sạn / khu nghỉ dưỡng.", en:"Please take me to the hotel / resort.", enPron:"플리즈 테이크 미 투 더 호텔 / 리조트"},
+    {cat:"transport", ko:"여기에서 내려주세요.", vi:"Cho tôi xuống ở đây.", en:"Please drop me off here.", enPron:"플리즈 드롭 미 오프 히어"},
+    {cat:"transport", ko:"천천히 가주세요.", vi:"Đi chậm thôi.", en:"Please go slowly.", enPron:"플리즈 고 슬로울리"},
+    {cat:"transport", ko:"미터기를 켜주세요.", vi:"Vui lòng bật đồng hồ tính tiền.", en:"Please turn on the meter.", enPron:"플리즈 턴 온 더 미터"},
+    {cat:"transport", ko:"얼마나 걸리나요?", vi:"Mất bao lâu?", en:"How long will it take?", enPron:"하우 롱 윌 잇 테이크?"},
+    {cat:"transport", ko:"여기가 맞나요?", vi:"Đúng chỗ này không?", en:"Is this the right place?", enPron:"이즈 디스 더 라이트 플레이스?"},
+    {cat:"transport", ko:"정지해 주세요.", vi:"Dừng lại, làm ơn.", en:"Please stop.", enPron:"플리즈 스탑"},
 
     // 식당
-    {cat:"food", ko:"메뉴 주세요.", vi:"Cho tôi xem thực đơn, làm ơn.", pron:"쪼 또이 셈 특 던, 람 언", en:"Menu, please."},
-    {cat:"food", ko:"이거 주문하고 싶습니다.", vi:"Tôi muốn gọi món này.", pron:"또이 무온 고이 몬 나이", en:"I’d like to order this."},
-    {cat:"food", ko:"물 주세요.", vi:"Cho tôi nước, làm ơn.", pron:"쪼 또이 느억, 람 언", en:"Water, please."},
-    {cat:"food", ko:"콜라를 주문하고 싶습니다.", vi:"Tôi muốn gọi Coca.", pron:"또이 무온 고이 코카", en:"I’d like to order a Coke."},
-    {cat:"food", ko:"맥주를 주문하고 싶습니다.", vi:"Tôi muốn gọi bia.", pron:"또이 무온 고이 비아", en:"I’d like to order beer."},
-    {cat:"food", ko:"고수를 빼주세요.", vi:"Vui lòng không cho rau mùi.", pron:"부이 롱 콩 쪼 자우 무이", en:"Please don’t add cilantro."},
-    {cat:"food", ko:"덜 맵게 해주세요.", vi:"Vui lòng làm ít cay.", pron:"부이 롱 람 잇 까이", en:"Please make it less spicy."},
-    {cat:"food", ko:"매운 거 빼주세요.", vi:"Vui lòng không cho ớt.", pron:"부이 롱 콩 쪼 엇", en:"Please don’t add chili."},
-    {cat:"food", ko:"과일이 있습니까?", vi:"Có trái cây không?", pron:"꺼 짜이 꺼이 콩", en:"Do you have fruit?"},
-    {cat:"food", ko:"채식 메뉴가 있습니까?", vi:"Có món chay không?", pron:"꺼 몬 짜이 콩", en:"Do you have vegetarian food?"},
-    {cat:"food", ko:"포장해 주세요.", vi:"Cho tôi mang về, làm ơn.", pron:"쪼 또이 망 베, 람 언", en:"To go, please."},
-    {cat:"food", ko:"계산서 주세요.", vi:"Tính tiền, làm ơn.", pron:"띵 띠엔, 람 언", en:"Bill, please."},
-    {cat:"food", ko:"카드로 결제할 수 있나요?", vi:"Tôi có thể thanh toán bằng thẻ không?", pron:"또이 꺼 테 타인 또안 방 테 콩", en:"Can I pay by card?"},
-    {cat:"food", ko:"고추장 있습니까?", vi:"Có gochujang không?", pron:"꺼 고추장 콩", en:"Do you have gochujang?"},
+    {cat:"food", ko:"메뉴 주세요.", vi:"Cho tôi xem thực đơn, làm ơn.", en:"Menu, please.", enPron:"메뉴, 플리즈"},
+    {cat:"food", ko:"이거 주문하고 싶습니다.", vi:"Tôi muốn gọi món này.", en:"I’d like to order this.", enPron:"아이드 라이크 투 오더 디스"},
+    {cat:"food", ko:"물 주세요.", vi:"Cho tôi nước, làm ơn.", en:"Water, please.", enPron:"워터, 플리즈"},
+    {cat:"food", ko:"콜라를 주문하고 싶습니다.", vi:"Tôi muốn gọi Coca.", en:"I’d like to order a Coke.", enPron:"아이드 라이크 투 오더 어 코크"},
+    {cat:"food", ko:"맥주를 주문하고 싶습니다.", vi:"Tôi muốn gọi bia.", en:"I’d like to order beer.", enPron:"아이드 라이크 투 오더 비어"},
+    {cat:"food", ko:"고수를 빼주세요.", vi:"Vui lòng không cho rau mùi.", en:"Please don’t add cilantro.", enPron:"플리즈 돈트 애드 실란트로"},
+    {cat:"food", ko:"덜 맵게 해주세요.", vi:"Vui lòng làm ít cay.", en:"Please make it less spicy.", enPron:"플리즈 메이크 잇 레스 스파이시"},
+    {cat:"food", ko:"매운 거 빼주세요.", vi:"Vui lòng không cho ớt.", en:"Please don’t add chili.", enPron:"플리즈 돈트 애드 칠리"},
+    {cat:"food", ko:"과일이 있습니까?", vi:"Có trái cây không?", en:"Do you have fruit?", enPron:"두 유 해브 프룻?"},
+    {cat:"food", ko:"채식 메뉴가 있습니까?", vi:"Có món chay không?", en:"Do you have vegetarian food?", enPron:"두 유 해브 베지테리언 푸드?"},
+    {cat:"food", ko:"포장해 주세요.", vi:"Cho tôi mang về, làm ơn.", en:"To go, please.", enPron:"투 고, 플리즈"},
+    {cat:"food", ko:"계산서 주세요.", vi:"Tính tiền, làm ơn.", en:"Bill, please.", enPron:"빌, 플리즈"},
+    {cat:"food", ko:"카드로 결제할 수 있나요?", vi:"Tôi có thể thanh toán bằng thẻ không?", en:"Can I pay by card?", enPron:"캔 아이 페이 바이 카드?"},
+    {cat:"food", ko:"고추장 있습니까?", vi:"Có gochujang không?", en:"Do you have gochujang?", enPron:"두 유 해브 고추장?"},
 
     // 가격/결제
-    {cat:"money", ko:"얼마입니까?", vi:"Bao nhiêu tiền?", pron:"바오 니에우 띠엔", en:"How much is it?"},
-    {cat:"money", ko:"좀 깎아주실 수 있나요?", vi:"Bạn có thể giảm giá một chút không?", pron:"반 꺼 테 잠 자 못 춧 콩", en:"Can you give me a discount?"},
-    {cat:"money", ko:"이거 2개 주세요.", vi:"Cho tôi 2 cái này.", pron:"쪼 또이 하이 까이 나이", en:"Two of these, please."},
-    {cat:"money", ko:"영수증 주세요.", vi:"Cho tôi xin hóa đơn.", pron:"쪼 또이 씬 화 던", en:"Please give me a receipt."},
-    {cat:"money", ko:"현금으로 결제할게요.", vi:"Tôi sẽ trả bằng tiền mặt.", pron:"또이 세 짜 방 띠엔 맛", en:"I will pay in cash."},
-    {cat:"money", ko:"카드로 결제할게요.", vi:"Tôi sẽ trả bằng thẻ.", pron:"또이 세 짜 방 테", en:"I will pay by card."},
+    {cat:"money", ko:"얼마입니까?", vi:"Bao nhiêu tiền?", en:"How much is it?", enPron:"하우 머치 이즈 잇?"},
+    {cat:"money", ko:"좀 깎아주실 수 있나요?", vi:"Bạn có thể giảm giá một chút không?", en:"Can you give me a discount?", enPron:"캔 유 기브 미 어 디스카운트?"},
+    {cat:"money", ko:"이거 2개 주세요.", vi:"Cho tôi 2 cái này.", en:"Two of these, please.", enPron:"투 오브 디즈, 플리즈"},
+    {cat:"money", ko:"영수증 주세요.", vi:"Cho tôi xin hóa đơn.", en:"Please give me a receipt.", enPron:"플리즈 기브 미 어 리싯"},
+    {cat:"money", ko:"현금으로 결제할게요.", vi:"Tôi sẽ trả bằng tiền mặt.", en:"I will pay in cash.", enPron:"아이 윌 페이 인 캐시"},
+    {cat:"money", ko:"카드로 결제할게요.", vi:"Tôi sẽ trả bằng thẻ.", en:"I will pay by card.", enPron:"아이 윌 페이 바이 카드"},
 
     // 긴급
-    {cat:"help", ko:"도와주세요!", vi:"Giúp tôi với!", pron:"줍 또이 버이!", en:"Help me!"},
-    {cat:"help", ko:"길을 잃었습니다.", vi:"Tôi bị lạc.", pron:"또이 비 락", en:"I’m lost."},
-    {cat:"help", ko:"경찰을 불러주세요.", vi:"Gọi cảnh sát giúp tôi.", pron:"고이 깐 삿 줍 또이", en:"Please call the police."},
-    {cat:"help", ko:"병원에 가야 합니다.", vi:"Tôi cần đến bệnh viện.", pron:"또이 껀 덴 벤 비엔", en:"I need to go to the hospital."},
-    {cat:"help", ko:"약국은 어디입니까?", vi:"Nhà thuốc ở đâu?", pron:"냐 투옥 어 다우", en:"Where is the pharmacy?"},
-    {cat:"help", ko:"휴대폰을 잃어버렸습니다.", vi:"Tôi bị mất điện thoại.", pron:"또이 비 멋 디엔 토아이", en:"I lost my phone."}
+    {cat:"help", ko:"도와주세요!", vi:"Giúp tôi với!", en:"Help me!", enPron:"헬프 미!"},
+    {cat:"help", ko:"길을 잃었습니다.", vi:"Tôi bị lạc.", en:"I’m lost.", enPron:"아임 로스트"},
+    {cat:"help", ko:"경찰을 불러주세요.", vi:"Gọi cảnh sát giúp tôi.", en:"Please call the police.", enPron:"플리즈 콜 더 폴리스"},
+    {cat:"help", ko:"병원에 가야 합니다.", vi:"Tôi cần đến bệnh viện.", en:"I need to go to the hospital.", enPron:"아이 니드 투 고 투 더 하스피털"},
+    {cat:"help", ko:"약국은 어디입니까?", vi:"Nhà thuốc ở đâu?", en:"Where is the pharmacy?", enPron:"웨어 이즈 더 파머시?"},
+    {cat:"help", ko:"휴대폰을 잃어버렸습니다.", vi:"Tôi bị mất điện thoại.", en:"I lost my phone.", enPron:"아이 로스트 마이 폰"}
   ];
 
   // ---- State ----
-  const LS_FAV = "vn_btn_fav_v2";
-  const LS_CAT = "vn_btn_cat_v2";
+  const LS_FAV = "vn_btn_fav_v3";
+  const LS_CAT = "vn_btn_cat_v3";
 
   let favorites = new Set(JSON.parse(localStorage.getItem(LS_FAV) || "[]"));
   let selectedCat = localStorage.getItem(LS_CAT) || "greet";
@@ -497,8 +533,10 @@
 
   const mKo = $("mKo");
   const mVi = $("mVi");
-  const mPron = $("mPron");
+  const mEnPron = $("mEnPron");
   const mEn = $("mEn");
+
+  const photoTranslateBtn = $("photoTranslateBtn");
 
   let currentIdx = -1;
 
@@ -605,7 +643,7 @@
 
     mKo.textContent = p.ko;
     mVi.textContent = p.vi;
-    mPron.textContent = "발음: " + (p.pron || "-");
+    mEnPron.textContent = "영어 발음: " + (p.enPron || "-");
     mEn.textContent = p.en;
 
     toggleFavBtn.textContent = (isFav(idx) ? "⭐ 즐겨찾기 해제" : "⭐ 즐겨찾기");
@@ -680,6 +718,22 @@
       else await document.exitFullscreen();
     }catch{
       // ignore
+    }
+  };
+
+  // 📷 구글 사진 번역 버튼: 구글 번역(모바일에서 카메라/렌즈 유도)
+  // - 브라우저에선 카메라 기능이 제한될 수 있어, 구글 번역/렌즈 앱이 있으면 그쪽으로 이어지는 경우가 많습니다.
+  photoTranslateBtn.onclick = () => {
+    vibrate();
+    // 1순위: 구글 렌즈(웹) - 기기에 따라 앱으로 열림
+    const lensUrl = "https://lens.google.com/";
+    // 2순위(대안): 구글 번역(웹)
+    const translateUrl = "https://translate.google.com/?sl=auto&tl=ko&op=translate";
+
+    // 렌즈 먼저 시도 후, 브라우저가 막으면 번역으로 유도(사용자에겐 새 탭으로 열림)
+    const win = window.open(lensUrl, "_blank", "noopener,noreferrer");
+    if (!win) {
+      window.location.href = translateUrl;
     }
   };
 
