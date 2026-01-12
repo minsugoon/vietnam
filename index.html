@@ -721,19 +721,19 @@
     }
   };
 
-  // 📷 구글 사진 번역 버튼 (수정1 반영)
-  // - Google Lens 앱이 설치되어 있으면 즉시 앱을 열고
-  // - 없으면 Google Lens 플레이스토어로 이동
+  // 📷 구글 사진 번역 버튼 (요청 반영)
+  // - Google 번역 앱이 설치되어 있으면 즉시 앱을 열고
+  // - 없으면 Google 번역 플레이스토어로 이동
   photoTranslateBtn.onclick = () => {
     vibrate();
 
-    // Google Lens 패키지명
-    const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=com.google.ar.lens";
+    // Google Translate 패키지명
+    const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=com.google.android.apps.translate";
     // Android intent: 앱 실행 시도
     const INTENT_URL =
-      "intent://scan/#Intent;scheme=googlelens;package=com.google.ar.lens;end";
+      "intent://translate/#Intent;scheme=googletranslate;package=com.google.android.apps.translate;end";
 
-    // 1) 앱 실행 시도 (대부분 Chrome/Android에서 동작)
+    // 1) 앱 실행 시도
     // 2) 실패하면 일정 시간 후 플레이스토어로 폴백
     let opened = false;
 
@@ -744,7 +744,7 @@
       }
     }, 900);
 
-    // visibilitychange: 앱으로 전환되면 페이지가 숨겨짐 → opened 처리
+    // 앱으로 전환되면 페이지가 숨겨짐 → opened 처리
     const onVis = () => {
       if (document.hidden) {
         opened = true;
@@ -756,8 +756,6 @@
 
     // 인텐트 실행
     window.location.href = INTENT_URL;
-
-    // 만약 브라우저가 인텐트를 차단하면, 타이머가 플레이스토어로 이동시킴
   };
 
   // voices load (Android)
