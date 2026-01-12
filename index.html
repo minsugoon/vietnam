@@ -377,7 +377,7 @@
       <div class="note" style="padding:0 6px;">
         • ⭐ 즐겨찾기: 목록의 별(⭐)을 눌러 저장하거나, 문장 화면에서 저장할 수 있습니다.<br>
         • 🔊 음성: 기기/브라우저가 베트남어 음성을 지원할 때만 재생됩니다.<br>
-        • 📷 사진 번역: 구글 번역/렌즈 화면으로 이동합니다(인터넷 필요).
+        • 📷 사진 번역: 구글 렌즈 앱이 설치되어 있으면 앱을 열고, 없으면 플레이스토어로 이동합니다(인터넷 필요).
       </div>
     </main>
   </div>
@@ -721,20 +721,43 @@
     }
   };
 
-  // 📷 구글 사진 번역 버튼: 구글 번역(모바일에서 카메라/렌즈 유도)
-  // - 브라우저에선 카메라 기능이 제한될 수 있어, 구글 번역/렌즈 앱이 있으면 그쪽으로 이어지는 경우가 많습니다.
+  // 📷 구글 사진 번역 버튼 (수정1 반영)
+  // - Google Lens 앱이 설치되어 있으면 즉시 앱을 열고
+  // - 없으면 Google Lens 플레이스토어로 이동
   photoTranslateBtn.onclick = () => {
     vibrate();
-    // 1순위: 구글 렌즈(웹) - 기기에 따라 앱으로 열림
-    const lensUrl = "https://lens.google.com/";
-    // 2순위(대안): 구글 번역(웹)
-    const translateUrl = "https://translate.google.com/?sl=auto&tl=ko&op=translate";
 
-    // 렌즈 먼저 시도 후, 브라우저가 막으면 번역으로 유도(사용자에겐 새 탭으로 열림)
-    const win = window.open(lensUrl, "_blank", "noopener,noreferrer");
-    if (!win) {
-      window.location.href = translateUrl;
-    }
+    // Google Lens 패키지명
+    const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=com.google.ar.lens";
+    // Android intent: 앱 실행 시도
+    const INTENT_URL =
+      "intent://scan/#Intent;scheme=googlelens;package=com.google.ar.lens;end";
+
+    // 1) 앱 실행 시도 (대부분 Chrome/Android에서 동작)
+    // 2) 실패하면 일정 시간 후 플레이스토어로 폴백
+    let opened = false;
+
+    const start = Date.now();
+    const timer = setTimeout(() => {
+      if (!opened && (Date.now() - start) < 1800) {
+        window.location.href = PLAY_STORE_URL;
+      }
+    }, 900);
+
+    // visibilitychange: 앱으로 전환되면 페이지가 숨겨짐 → opened 처리
+    const onVis = () => {
+      if (document.hidden) {
+        opened = true;
+        clearTimeout(timer);
+        document.removeEventListener("visibilitychange", onVis);
+      }
+    };
+    document.addEventListener("visibilitychange", onVis);
+
+    // 인텐트 실행
+    window.location.href = INTENT_URL;
+
+    // 만약 브라우저가 인텐트를 차단하면, 타이머가 플레이스토어로 이동시킴
   };
 
   // voices load (Android)
