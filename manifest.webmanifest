@@ -1,0 +1,8 @@
+{
+  "name": "베트남 여행 버튼 대화",
+  "short_name": "베트남버튼",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f0f12",
+  "theme_color": "#111111"
+}
