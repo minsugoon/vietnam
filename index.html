@@ -1,782 +1,261 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-
-  <!-- 시스템 다크/라이트 모드에 맞춰 주소창 색도 변경 -->
-  <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)" />
-  <meta name="theme-color" content="#0f0f12" media="(prefers-color-scheme: dark)" />
-
-  <title>베트남 여행 버튼 대화</title>
-  <link rel="manifest" href="manifest.webmanifest">
-
+  <title>민수군 시니어 베트남 번역기</title>
+  <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22민수군번역기%22,%22short_name%22:%22번역기%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23FDFCF8%22,%22theme_color%22:%22%231e4d2b%22}">
   <style>
-    /* 기본: 라이트 모드 */
-    :root{
-      --bg:#f5f5f7;
-      --card:#ffffff;
-      --card2:#f0f1f4;
-      --text:#111217;
-      --muted:#5a6072;
-      --border: rgba(0,0,0,0.10);
+    :root {
+      --bg: #FDFCF8; 
+      --card: #ffffff;
+      --text: #1a1a1a;
+      --muted: #666666;
+      --accent: #1e4d2b; 
+      --border: #e0e0e0;
+      --shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { margin: 0; font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); -webkit-user-select: none; }
+    
+    header { padding: 30px 20px 15px; background: var(--card); border-bottom: 2px solid var(--border); text-align: center; }
+    .main-title { font-size: 28px; font-weight: 900; color: var(--accent); }
+    .sub-title { font-size: 16px; color: var(--muted); margin-top: 8px; font-weight: 700; }
 
-      --accent:#0284c7;
-      --good:#059669;
-      --danger:#e11d48;
+    /* 상황(카테고리) 탭 - 이모지 포함 */
+    .nav-tabs { position: sticky; top: 0; z-index: 10; background: var(--card); display: flex; overflow-x: auto; padding: 15px 10px; gap: 12px; border-bottom: 1px solid var(--border); }
+    .nav-tabs::-webkit-scrollbar { display: none; }
+    .tab-btn { flex: 0 0 auto; padding: 14px 24px; border-radius: 35px; border: 2px solid var(--border); background: var(--card); font-size: 19px; font-weight: 800; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+    .tab-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
 
-      --radius:18px;
-      --shadow: 0 14px 40px rgba(0,0,0,0.10);
-    }
+    /* 핵심 단어(키워드) 구역 */
+    .keyword-section { padding: 15px 15px 0; background: var(--bg); }
+    .keyword-label { font-size: 15px; color: var(--accent); font-weight: 900; margin-bottom: 10px; display: block; }
+    .keyword-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+    .keyword-btn { background: #e8f0e9; border: 2px solid var(--accent); color: var(--accent); padding: 12px 20px; border-radius: 15px; font-size: 19px; font-weight: 800; cursor: pointer; }
 
-    /* 시스템 다크 모드 */
-    @media (prefers-color-scheme: dark){
-      :root{
-        --bg:#0f0f12;
-        --card:#17171c;
-        --card2:#1f1f26;
-        --text:#f5f5f7;
-        --muted:#b9bbc6;
-        --border: rgba(255,255,255,0.12);
+    /* 표현 리스트 */
+    main { padding: 15px; margin-bottom: 80px; }
+    .phrase-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+    .phrase-item { background: var(--card); border: 1px solid var(--border); padding: 25px 20px; border-radius: 20px; box-shadow: var(--shadow); cursor: pointer; }
+    .ko-txt { font-size: 22px; font-weight: 800; color: #000; display: block; margin-bottom: 6px; }
+    .vi-hint { font-size: 16px; color: var(--muted); font-weight: 600; }
 
-        --accent:#7dd3fc;
-        --good:#34d399;
-        --danger:#fb7185;
+    /* 모달 */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; flex-direction: column; justify-content: center; padding: 15px; z-index: 100; }
+    .modal-overlay.open { display: flex; }
+    .modal-body { background: white; border-radius: 30px; padding: 45px 20px; text-align: center; }
+    .vi-big { font-size: 55px; font-weight: 900; line-height: 1.1; color: #000; margin-bottom: 20px; word-break: keep-all; }
+    .en-mid { font-size: 24px; color: var(--accent); font-weight: 700; margin-bottom: 30px; }
+    .ko-mid { font-size: 22px; color: #666; border-top: 1px solid #eee; padding-top: 25px; font-weight: 800; }
+    .close-modal-btn { margin-top: 40px; background: #222; color: white; border: none; padding: 20px 0; border-radius: 45px; font-size: 24px; font-weight: 800; width: 100%; cursor: pointer; }
 
-        --shadow: 0 20px 60px rgba(0,0,0,0.55);
-      }
-    }
-
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial, sans-serif;
-      background:var(--bg);
-      color:var(--text);
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .app{
-      min-height:100svh;
-      display:flex;
-      flex-direction:column;
-      padding: env(safe-area-inset-top) 12px env(safe-area-inset-bottom) 12px;
-      gap:10px;
-    }
-
-    header{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      padding:10px 8px 2px 8px;
-    }
-
-    .title{
-      font-size:20px;
-      font-weight:900;
-      letter-spacing:-0.3px;
-      line-height:1.1;
-    }
-    .subtitle{
-      font-size:13px;
-      color:var(--muted);
-      margin-top:2px;
-      font-weight:700;
-    }
-
-    /* 구글 사진 번역 버튼 */
-    .top-actions{
-      padding:0 6px 2px 6px;
-    }
-    .photo-btn{
-      width:100%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      padding:14px 14px;
-      border-radius:18px;
-      border:1px solid var(--border);
-      background:linear-gradient(180deg, var(--card), var(--card2));
-      color:var(--text);
-      font-size:16px;
-      font-weight:1000;
-      cursor:pointer;
-      box-shadow: 0 1px 0 rgba(0,0,0,0.03);
-    }
-    .photo-btn:active{transform:translateY(1px)}
-    .photo-btn .small{
-      font-size:12px;
-      font-weight:800;
-      color:var(--muted);
-    }
-
-    .tabs{
-      display:flex;
-      gap:10px;
-      overflow:auto;
-      padding:6px;
-      scroll-snap-type:x mandatory;
-    }
-    .tab{
-      scroll-snap-align:start;
-      flex:0 0 auto;
-      display:flex;
-      align-items:center;
-      gap:8px;
-      background:var(--card);
-      border:1px solid var(--border);
-      padding:14px 14px;
-      border-radius:999px;
-      font-size:16px;
-      font-weight:900;
-      color:var(--text);
-      user-select:none;
-      box-shadow: 0 1px 0 rgba(0,0,0,0.03);
-    }
-    .tab.active{
-      outline:2px solid color-mix(in srgb, var(--accent), transparent 55%);
-      border-color: color-mix(in srgb, var(--accent), transparent 55%);
-    }
-
-    main{
-      flex:1;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      padding:0 6px 6px 6px;
-    }
-
-    .grid{
-      display:grid;
-      grid-template-columns:1fr;
-      gap:10px;
-    }
-    @media (min-width: 540px){
-      .grid{grid-template-columns:1fr 1fr}
-    }
-
-    .btn{
-      background:linear-gradient(180deg, var(--card), var(--card2));
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      padding:18px 16px;
-      text-align:left;
-      color:var(--text);
-      font-size:18px;
-      font-weight:1000;
-      line-height:1.15;
-      cursor:pointer;
-      position:relative;
-      min-height:72px;
-      box-shadow: 0 1px 0 rgba(0,0,0,0.03);
-    }
-    .btn .hint{
-      display:block;
-      margin-top:8px;
-      font-size:13px;
-      color:var(--muted);
-      font-weight:800;
-      line-height:1.25;
-    }
-    .btn:active{transform:translateY(1px)}
-
-    .btn .star{
-      position:absolute;
-      right:12px;
-      top:12px;
-      width:44px;
-      height:44px;
-      display:grid;
-      place-items:center;
-      border-radius:12px;
-      background: color-mix(in srgb, var(--card), transparent 10%);
-      border:1px solid var(--border);
-      font-size:20px;
-    }
-
-    /* Modal */
-    .overlay{
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,0.55);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding:12px;
-      z-index:50;
-    }
-    @media (prefers-color-scheme: light){
-      .overlay{ background: rgba(0,0,0,0.35); }
-    }
-    .overlay.show{display:flex}
-
-    .modal{
-      width:min(720px, 100%);
-      background:linear-gradient(180deg, var(--card), var(--bg));
-      border:1px solid var(--border);
-      border-radius:22px;
-      overflow:hidden;
-      box-shadow: var(--shadow);
-    }
-
-    .modal-header{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      padding:12px 12px;
-      background: color-mix(in srgb, var(--card), transparent 4%);
-      border-bottom:1px solid var(--border);
-    }
-    .modal-header .kocat{
-      font-weight:1000;
-      font-size:14px;
-      color:var(--muted);
-      letter-spacing:0.2px;
-    }
-    .modal-header .close{
-      margin-left:auto;
-      background: color-mix(in srgb, var(--card2), transparent 0%);
-      border:1px solid var(--border);
-      border-radius:14px;
-      padding:10px 12px;
-      font-size:16px;
-      font-weight:1000;
-      color:var(--text);
-      min-width:76px;
-    }
-
-    .modal-body{
-      padding:14px 14px 12px 14px;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-    }
-
-    .card{
-      background: color-mix(in srgb, var(--card2), transparent 0%);
-      border:1px solid var(--border);
-      border-radius:18px;
-      padding:14px;
-    }
-    .label{
-      font-size:13px;
-      color:var(--muted);
-      font-weight:1000;
-      margin-bottom:8px;
-    }
-    .ko{
-      font-size:18px;
-      font-weight:1000;
-      line-height:1.2;
-    }
-
-    .vi{
-      margin-top:10px;
-      font-size:38px;
-      font-weight:1100;
-      line-height:1.12;
-      letter-spacing:-0.2px;
-    }
-    .en{
-      margin-top:8px;
-      font-size:18px;
-      font-weight:950;
-      color: color-mix(in srgb, var(--text), transparent 8%);
-    }
-    .enpron{
-      margin-top:10px;
-      font-size:16px;
-      font-weight:950;
-      color: color-mix(in srgb, var(--text), transparent 12%);
-      line-height:1.25;
-    }
-
-    .actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-    .actions button{
-      flex:1;
-      min-width:140px;
-      background: color-mix(in srgb, var(--card2), transparent 0%);
-      border:1px solid var(--border);
-      border-radius:16px;
-      padding:14px 14px;
-      font-size:16px;
-      font-weight:1100;
-      color:var(--text);
-    }
-    .actions button.primary{
-      outline:2px solid color-mix(in srgb, var(--accent), transparent 55%);
-      border-color: color-mix(in srgb, var(--accent), transparent 55%);
-    }
-    .actions button.good{
-      outline:2px solid color-mix(in srgb, var(--good), transparent 60%);
-      border-color: color-mix(in srgb, var(--good), transparent 65%);
-    }
-    .actions button.danger{
-      outline:2px solid color-mix(in srgb, var(--danger), transparent 70%);
-      border-color: color-mix(in srgb, var(--danger), transparent 75%);
-    }
-
-    .note{
-      font-size:12px;
-      color:var(--muted);
-      line-height:1.35;
-      font-weight:750;
-    }
-
-    .toast{
-      position:fixed;
-      left:50%;
-      bottom:18px;
-      transform:translateX(-50%);
-      background:rgba(0,0,0,0.78);
-      border:1px solid rgba(255,255,255,0.12);
-      color:#fff;
-      padding:12px 14px;
-      border-radius:999px;
-      font-size:14px;
-      font-weight:1000;
-      display:none;
-      z-index:60;
-    }
-    @media (prefers-color-scheme: light){
-      .toast{
-        background: rgba(0,0,0,0.78);
-        border: 1px solid rgba(255,255,255,0.18);
-      }
-    }
-    .toast.show{display:block}
+    /* 설치 안내 버튼 */
+    #installBanner { position: fixed; bottom: 0; left: 0; right: 0; background: var(--accent); color: white; padding: 15px; text-align: center; font-weight: 800; display: none; z-index: 50; }
   </style>
 </head>
-
 <body>
-  <div class="app" id="app">
-    <header>
-      <div>
-        <div class="title">베트남 여행 버튼 대화</div>
-        <div class="subtitle">문장 버튼 → 베트남어 큰 글씨 → 상대에게 화면을 보여주세요</div>
-      </div>
-    </header>
 
-    <!-- 구글 사진 번역 버튼(추가) -->
-    <div class="top-actions">
-      <button class="photo-btn" id="photoTranslateBtn" type="button">
-        📷 구글 번역 열기
-        <span class="small">(메뉴/표지판 촬영)</span>
-      </button>
-    </div>
+<header>
+  <div class="main-title">🇻🇳 베트남 여행 번역기</div>
+  <div class="sub-title">그림 버튼을 누르고 단어나 문장을 선택하세요</div>
+</header>
 
-    <div class="tabs" id="tabs"></div>
+<div class="nav-tabs" id="tabBar"></div>
 
-    <main>
-      <div class="grid" id="grid"></div>
-      <div class="note" style="padding:0 6px;">
-        • ⭐ 즐겨찾기: 목록의 별(⭐)을 눌러 저장하거나, 문장 화면에서 저장할 수 있습니다.<br>
-        • 🔊 음성: 기기/브라우저가 베트남어 음성을 지원할 때만 재생됩니다.<br>
-        • 📷 사진 번역: 구글 번역 앱이 설치되어 있으면 앱을 열고, 없으면 플레이스토어로 이동합니다(인터넷 필요).
-      </div>
-    </main>
+<div class="keyword-section">
+  <span class="keyword-label">📍 물건 보여주기 (단어)</span>
+  <div class="keyword-grid" id="keywordGrid"></div>
+</div>
+
+<main><div class="phrase-grid" id="phraseList"></div></main>
+
+<div id="installBanner" onclick="installApp()">📱 휴대폰 화면에 아이콘 추가하기</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
+  <div class="modal-body" onclick="event.stopPropagation()">
+    <div class="vi-big" id="targetVi"></div>
+    <div class="en-mid" id="targetEn"></div>
+    <div class="ko-mid" id="targetKo"></div>
+    <button class="close-modal-btn" onclick="closeModal()">화면 닫기</button>
   </div>
-
-  <!-- Modal -->
-  <div class="overlay" id="overlay" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true">
-      <div class="modal-header">
-        <div class="kocat" id="modalCat"></div>
-        <button class="close" id="closeModal">닫기</button>
-      </div>
-
-      <div class="modal-body">
-        <div class="card">
-          <div class="label">한국어</div>
-          <div class="ko" id="mKo"></div>
-        </div>
-
-        <div class="card">
-          <div class="label">베트남어 (상대에게 보여주기)</div>
-          <div class="vi" id="mVi"></div>
-          <div class="enpron" id="mEnPron"></div>
-          <div class="en" id="mEn"></div>
-        </div>
-
-        <div class="actions">
-          <button class="good" id="toggleFav">⭐ 즐겨찾기</button>
-          <button class="primary" id="speakVi">🔊 베트남어 읽기</button>
-          <button class="danger" id="fullscreen">🔆 화면 최대</button>
-        </div>
-
-        <div class="note" id="ttsNote"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="toast" id="toast"></div>
+</div>
 
 <script>
-(() => {
-  const $ = (id) => document.getElementById(id);
-
-  const CATS = [
-    { key:"fav", icon:"⭐", name:"즐겨찾기" },
-    { key:"greet", icon:"👋", name:"인사" },
-    { key:"basic", icon:"🧭", name:"기본" },
-    { key:"airport", icon:"✈️", name:"공항" },
-    { key:"hotel", icon:"🏨", name:"숙소/예약" },
-    { key:"transport", icon:"🚕", name:"교통" },
-    { key:"food", icon:"🍜", name:"식당" },
-    { key:"money", icon:"💳", name:"가격/결제" },
-    { key:"help", icon:"🆘", name:"긴급" }
+  // 카테고리 정보와 상황 이모지
+  const CATEGORIES = [
+    { id: "인사/기본", emoji: "👋" },
+    { id: "공항", emoji: "✈️" },
+    { id: "기내", emoji: "💺" },
+    { id: "숙소", emoji: "🏨" },
+    { id: "교통", emoji: "🚕" },
+    { id: "식당", emoji: "🍴" },
+    { id: "결제", emoji: "💳" },
+    { id: "긴급", emoji: "🆘" }
   ];
 
-  // 문장 데이터
-  // enPron: 영어 발음(한국어 표기) - '대충 읽기' 수준의 안내입니다.
-  const PHRASES = [
-    // 인사
-    {cat:"greet", ko:"안녕하세요.", vi:"Xin chào.", en:"Hello.", enPron:"헬로"},
-    {cat:"greet", ko:"감사합니다.", vi:"Cảm ơn.", en:"Thank you.", enPron:"땡큐"},
-    {cat:"greet", ko:"죄송합니다.", vi:"Xin lỗi.", en:"Sorry / Excuse me.", enPron:"쏘리 / 익스큐즈 미"},
-    {cat:"greet", ko:"좋은 하루 되세요.", vi:"Chúc bạn một ngày tốt lành.", en:"Have a nice day.", enPron:"해브 어 나이스 데이"},
-    {cat:"greet", ko:"도와주셔서 감사합니다.", vi:"Cảm ơn bạn đã giúp tôi.", en:"Thank you for helping me.", enPron:"땡큐 포 헬핑 미"},
+  // 상단 핵심 단어 (키워드) 데이터
+  const KEYWORDS = {
+    "인사/기본": [{ko:"화장실", vi:"Nhà vệ sinh", en:"Restroom"}, {ko:"엘리베이터", vi:"Thang máy", en:"Elevator"}, {ko:"지도", vi:"Bản đồ", en:"Map"}],
+    "공항": [{ko:"여권", vi:"Hộ chiếu", en:"Passport"}, {ko:"수화물", vi:"Hành lý", en:"Baggage"}, {ko:"티켓", vi:"Vé", en:"Ticket"}, {ko:"좌석", vi:"Chỗ ngồi", en:"Seat"}, {ko:"게이트", vi:"Cổng", en:"Gate"}],
+    "기내": [{ko:"물", vi:"Nước", en:"Water"}, {ko:"담요", vi:"Chăn", en:"Blanket"}, {ko:"식사", vi:"Bữa ăn", en:"Meal"}],
+    "숙소": [{ko:"방 키", vi:"Thẻ phòng", en:"Room key"}, {ko:"수건", vi:"Khăn tắm", en:"Towel"}, {ko:"비밀번호", vi:"Mật khẩu", en:"Password"}, {ko:"조식", vi:"Bữa sáng", en:"Breakfast"}, {ko:"에어컨", vi:"Máy lạnh", en:"Air conditioner"}],
+    "교통": [{ko:"공항", vi:"Sân bay", en:"Airport"}, {ko:"호텔", vi:"Khách sạn", en:"Hotel"}, {ko:"리조트", vi:"Khu nghỉ dưỡng", en:"Resort"}, {ko:"셔틀", vi:"Xe đưa đón", en:"Shuttle"}, {ko:"택시", vi:"Taxi", en:"Taxi"}],
+    "식당": [{ko:"메뉴판", vi:"Thực đơn", en:"Menu"}, {ko:"물", vi:"Nước", en:"Water"}, {ko:"고수", vi:"Rau mùi", en:"Cilantro"}, {ko:"계산서", vi:"Tính tiền", en:"Bill"}, {ko:"카드", vi:"Thẻ", en:"Card"}],
+    "결제": [{ko:"영수증", vi:"Hóa đơn", en:"Receipt"}, {ko:"현금", vi:"Tiền mặt", en:"Cash"}, {ko:"카드", vi:"Thẻ", en:"Card"}],
+    "긴급": [{ko:"경찰", vi:"Cảnh sát", en:"Police"}, {ko:"병원", vi:"Bệnh viện", en:"Hospital"}, {ko:"약국", vi:"Nhà thuốc", en:"Pharmacy"}, {ko:"지갑", vi:"Ví", en:"Wallet"}, {ko:"휴대폰", vi:"Điện thoại", en:"Phone"}]
+  };
 
-    // 기본
-    {cat:"basic", ko:"한국 사람입니다.", vi:"Tôi là người Hàn Quốc.", en:"I’m Korean.", enPron:"아임 코리언"},
-    {cat:"basic", ko:"영어/베트남어를 못합니다. 천천히 말해 주세요.", vi:"Tôi không nói được tiếng Anh/tiếng Việt. Vui lòng nói chậm.", en:"I can’t speak English/Vietnamese. Please speak slowly.", enPron:"아이 캔트 스피크 잉글리시/비에트나미즈. 플리즈 스피크 슬로울리"},
-    {cat:"basic", ko:"다시 한 번 말해 주세요.", vi:"Vui lòng nói lại.", en:"Please say it again.", enPron:"플리즈 세이 잇 어게인"},
-    {cat:"basic", ko:"이걸로 괜찮나요?", vi:"Như vậy được không?", en:"Is this okay?", enPron:"이즈 디스 오케이?"},
-    {cat:"basic", ko:"화장실은 어디입니까?", vi:"Nhà vệ sinh ở đâu?", en:"Where is the restroom?", enPron:"웨어 이즈 더 레스트룸?"},
-    {cat:"basic", ko:"여기 좀 도와주세요.", vi:"Giúp tôi với, làm ơn.", en:"Please help me here.", enPron:"플리즈 헬프 미 히어"},
-    {cat:"basic", ko:"사진 찍어주실 수 있나요?", vi:"Bạn có thể chụp ảnh giúp tôi không?", en:"Could you take a photo for me?", enPron:"쿠드 유 테이크 어 포토 포 미?"},
-    {cat:"basic", ko:"이 주소로 가고 싶습니다.", vi:"Tôi muốn đến địa chỉ này.", en:"I want to go to this address.", enPron:"아이 원트 투 고 투 디스 어드레스"},
+  // 요청하신 전체 DATA 통합 [cite: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+  const DATA = [
+    { cat: "인사/기본", ko: "안녕하세요.", vi: "Xin chào.", en: "Hello." },
+    { cat: "인사/기본", ko: "반갑습니다.", vi: "Rất vui được gặp bạn.", en: "Nice to meet you." },
+    { cat: "인사/기본", ko: "감사합니다.", vi: "Cảm ơn.", en: "Thank you." },
+    { cat: "인사/기본", ko: "미안합니다.", vi: "Xin lỗi.", en: "I am sorry." },
+    { cat: "인사/기본", ko: "좋은 하루 되세요.", vi: "Chúc bạn một ngày tốt lành.", en: "Have a nice day." },
+    { cat: "인사/기본", ko: "도와주세요.", vi: "Giúp tôi với.", en: "Please help me." },
+    { cat: "인사/기본", ko: "화장실은 어디입니까?", vi: "Nhà vệ sinh ở đâu?", en: "Where is the restroom?" },
+    { cat: "인사/기본", ko: "얼마입니까?", vi: "Bao nhiêu tiền?", en: "How much is it?" },
+    { cat: "인사/기본", ko: "다시 한 번 말해 주세요.", vi: "Vui lòng nói lại.", en: "Please say it again." },
+    { cat: "인사/기본", ko: "사진 찍어주실 수 있나요?", vi: "Chụp ảnh giúp tôi nhé?", en: "Could you take a photo?" },
+    { cat: "인사/기본", ko: "무료입니까?", vi: "Nó có miễn phí không?", en: "Is it free?" },
+    { cat: "인사/기본", ko: "여기로 가고 싶습니다.", vi: "Tôi muốn đến chỗ này.", en: "I want to go here." },
+    { cat: "인사/기본", ko: "빌릴 수 있나요?", vi: "Tôi có thể mượn nó không?", en: "Can I borrow this?" },
+    { cat: "인사/기본", ko: "엘리베이터가 어디에 있나요?", vi: "Thang máy ở đâu?", en: "Where is the elevator?" },
 
-    // 공항
-    {cat:"airport", ko:"출국장(체크인)은 어디입니까?", vi:"Khu làm thủ tục (check-in) ở đâu?", en:"Where is the check-in area?", enPron:"웨어 이즈 더 체크인 에어리어?"},
-    {cat:"airport", ko:"수하물 찾는 곳은 어디입니까?", vi:"Khu nhận hành lý ở đâu?", en:"Where is baggage claim?", enPron:"웨어 이즈 배기지 클레임?"},
-    {cat:"airport", ko:"환전소는 어디입니까?", vi:"Quầy đổi tiền ở đâu?", en:"Where is the currency exchange?", enPron:"웨어 이즈 더 커런시 익스체인지?"},
-    {cat:"airport", ko:"택시 타는 곳은 어디입니까?", vi:"Chỗ bắt taxi ở đâu?", en:"Where can I get a taxi?", enPron:"웨어 캔 아이 겟 어 택시?"},
-    {cat:"airport", ko:"이 항공편이 맞나요? 확인해주세요.", vi:"Đây có đúng chuyến bay không? Vui lòng kiểm tra.", en:"Is this the right flight? Please check.", enPron:"이즈 디스 더 라이트 플라이트? 플리즈 체크"},
+    { cat: "공항", ko: "탑승 수속(체크인)을 하고 싶습니다.", vi: "Tôi muốn làm thủ tục chuyến bay.", en: "I'd like to check-in." },
+    { cat: "공항", ko: "보안 검색대는 어디인가요?", vi: "Khu vực kiểm tra an ninh ở đâu?", en: "Where is security?" },
+    { cat: "공항", ko: "입국 심사장은 어디인가요?", vi: "Khu vực nhập cảnh ở đâu?", en: "Where is immigration?" },
+    { cat: "공항", ko: "출국 심사장은 어디인가요?", vi: "Khu vực xuất cảnh ở đâu?", en: "Where is departure control?" },
+    { cat: "공항", ko: "탑승구(게이트)에서 기다리고 싶습니다.", vi: "Tôi muốn chờ ở cửa khởi hành.", en: "I want to wait at the gate." },
+    { cat: "공항", ko: "수하물 찾는 곳이 어디인가요?", vi: "Khu nhận hành lý ở đâu?", en: "Where is baggage claim?" },
+    { cat: "공항", ko: "여권 여기 있습니다.", vi: "Hộ chiếu의 tôi đây.", en: "Here is my passport." },
+    { cat: "공항", ko: "비행기 티켓 여기 있습니다.", vi: "Vé máy bay의 tôi đây.", en: "Here is my ticket." },
+    { cat: "공항", ko: "좌석을 변경하고 싶습니다.", vi: "Tôi muốn đổi chỗ ngồi.", en: "I'd like to change my seat." },
 
-    // 숙소/예약
-    {cat:"hotel", ko:"예약했습니다. 확인해주세요.", vi:"Tôi đã đặt phòng. Vui lòng kiểm tra giúp tôi.", en:"I have a reservation. Please check.", enPron:"아이 해브 어 레저베이션. 플리즈 체크"},
-    {cat:"hotel", ko:"체크인하고 싶습니다.", vi:"Tôi muốn làm thủ tục nhận phòng.", en:"I’d like to check in.", enPron:"아이드 라이크 투 체크인"},
-    {cat:"hotel", ko:"체크아웃하고 싶습니다.", vi:"Tôi muốn trả phòng.", en:"I’d like to check out.", enPron:"아이드 라이크 투 체크아웃"},
-    {cat:"hotel", ko:"방 키가 안 됩니다.", vi:"Thẻ phòng không dùng được.", en:"The room key card doesn’t work.", enPron:"더 룸 키 카드 더즌트 워크"},
-    {cat:"hotel", ko:"와이파이 비밀번호가 무엇입니까?", vi:"Mật khẩu Wi-Fi là gì?", en:"What is the Wi-Fi password?", enPron:"왓 이즈 더 와이파이 패스워드?"},
-    {cat:"hotel", ko:"수건을 더 주세요.", vi:"Cho tôi thêm khăn tắm, làm ơn.", en:"Please give me more towels.", enPron:"플리즈 기브 미 모어 타월즈"},
-    {cat:"hotel", ko:"방 청소 부탁드립니다.", vi:"Vui lòng dọn phòng giúp tôi.", en:"Please clean the room.", enPron:"플리즈 클린 더 룸"},
-    {cat:"hotel", ko:"에어컨이 작동하지 않습니다.", vi:"Máy lạnh không hoạt động.", en:"The air conditioner doesn’t work.", enPron:"디 에어 컨디셔너 더즌트 워크"},
+    { cat: "기내", ko: "좌석 번호를 확인해 주세요.", vi: "Kiểm tra số ghế giúp tôi.", en: "Please check my seat number." },
+    { cat: "기내", ko: "기내식을 확인하고 싶습니다.", vi: "Tôi muốn kiểm tra suất ăn.", en: "I'd like to check the meal." },
+    { cat: "기내", ko: "물 한 잔 주세요.", vi: "Cho tôi một ly nước.", en: "Water, please." },
+    { cat: "기내", ko: "콜라 한 잔 주세요.", vi: "Cho tôi 한 ly Coca.", en: "Coke, please." },
+    { cat: "기내", ko: "주스 한 잔 주세요.", vi: "Cho tôi 한 ly nước trái cây.", en: "Juice, please." },
+    { cat: "기내", ko: "커피 한 잔 주세요.", vi: "Cho tôi 한 ly cà phê.", en: "Coffee, please." },
+    { cat: "기내", ko: "몸이 너무 안 좋습니다. 도와주세요.", vi: "Tôi cảm thấy không khỏe. Giúp tôi.", en: "I feel sick. Help me." },
 
-    // 교통
-    {cat:"transport", ko:"공항으로 가주세요.", vi:"Làm ơn đưa tôi đến sân bay.", en:"Please take me to the airport.", enPron:"플리즈 테이크 미 투 디 에어포트"},
-    {cat:"transport", ko:"호텔(리조트)로 가주세요.", vi:"Làm ơn đưa tôi đến khách sạn / khu nghỉ dưỡng.", en:"Please take me to the hotel / resort.", enPron:"플리즈 테이크 미 투 더 호텔 / 리조트"},
-    {cat:"transport", ko:"여기에서 내려주세요.", vi:"Cho tôi xuống ở đây.", en:"Please drop me off here.", enPron:"플리즈 드롭 미 오프 히어"},
-    {cat:"transport", ko:"천천히 가주세요.", vi:"Đi chậm thôi.", en:"Please go slowly.", enPron:"플리즈 고 슬로울리"},
-    {cat:"transport", ko:"미터기를 켜주세요.", vi:"Vui lòng bật đồng hồ tính tiền.", en:"Please turn on the meter.", enPron:"플리즈 턴 온 더 미터"},
-    {cat:"transport", ko:"얼마나 걸리나요?", vi:"Mất bao lâu?", en:"How long will it take?", enPron:"하우 롱 윌 잇 테이크?"},
-    {cat:"transport", ko:"여기가 맞나요?", vi:"Đúng chỗ này không?", en:"Is this the right place?", enPron:"이즈 디스 더 라이트 플레이스?"},
-    {cat:"transport", ko:"정지해 주세요.", vi:"Dừng lại, làm ơn.", en:"Please stop.", enPron:"플리즈 스탑"},
+    { cat: "숙소", ko: "예약을 확인하고 싶습니다.", vi: "Tôi muốn xác nhận đặt phòng.", en: "I'd like to confirm my reservation." },
+    { cat: "숙소", ko: "체크인을 하고 싶습니다.", vi: "Tôi muốn nhận phòng.", en: "I'd like to check-in." },
+    { cat: "숙소", ko: "와이파이 비밀번호가 무엇인가요?", vi: "Mật khẩu Wi-Fi là gì?", en: "What is the Wi-Fi password?" },
+    { cat: "숙소", ko: "침대를 변경하고 싶습니다.", vi: "Tôi muốn đổi giường.", en: "I'd like to change the bed." },
+    { cat: "숙소", ko: "조식은 어디서 먹나요?", vi: "Ăn sáng ở đâu?", en: "Where is breakfast?" },
+    { cat: "숙소", ko: "방 키가 작동하지 않습니다.", vi: "Thẻ phòng không hoạt động.", en: "The room key card doesn't work." },
+    { cat: "숙소", ko: "에어컨이 작동하지 않습니다.", vi: "Máy lạnh không hoạt động.", en: "The air conditioner is broken." },
+    { cat: "숙소", ko: "전등이 작동하지 않습니다.", vi: "Đèn không hoạt động.", en: "The light doesn't work." },
+    { cat: "숙소", ko: "룸서비스를 하고 싶습니다.", vi: "Tôi muốn gọi dịch vụ phòng.", en: "Room service, please." },
+    { cat: "숙소", ko: "방 청소를 부탁합니다.", vi: "Vui lòng dọn phòng giúp tôi.", en: "Please clean the room." },
+    { cat: "숙소", ko: "수건을 교체해 주세요.", vi: "Làm ơn thay khăn tắm.", en: "Please change the towels." },
+    { cat: "숙소", ko: "수건을 더 주세요.", vi: "Cho tôi thêm khăn tắm.", en: "More towels, please." },
+    { cat: "숙소", ko: "셔틀 버스를 이용하고 싶습니다.", vi: "Tôi muốn đi xe đưa đón.", en: "I'd like to use the shuttle." },
+    { cat: "숙소", ko: "잠시 대여할 수 있나요?", vi: "Tôi có thể mượn nó một lát không?", en: "Can I borrow this for a moment?" },
 
-    // 식당
-    {cat:"food", ko:"메뉴 주세요.", vi:"Cho tôi xem thực đơn, làm ơn.", en:"Menu, please.", enPron:"메뉴, 플리즈"},
-    {cat:"food", ko:"이거 주문하고 싶습니다.", vi:"Tôi muốn gọi món này.", en:"I’d like to order this.", enPron:"아이드 라이크 투 오더 디스"},
-    {cat:"food", ko:"물 주세요.", vi:"Cho tôi nước, làm ơn.", en:"Water, please.", enPron:"워터, 플리즈"},
-    {cat:"food", ko:"콜라를 주문하고 싶습니다.", vi:"Tôi muốn gọi Coca.", en:"I’d like to order a Coke.", enPron:"아이드 라이크 투 오더 어 코크"},
-    {cat:"food", ko:"맥주를 주문하고 싶습니다.", vi:"Tôi muốn gọi bia.", en:"I’d like to order beer.", enPron:"아이드 라이크 투 오더 비어"},
-    {cat:"food", ko:"고수를 빼주세요.", vi:"Vui lòng không cho rau mùi.", en:"Please don’t add cilantro.", enPron:"플리즈 돈트 애드 실란트로"},
-    {cat:"food", ko:"덜 맵게 해주세요.", vi:"Vui lòng làm ít cay.", en:"Please make it less spicy.", enPron:"플리즈 메이크 잇 레스 스파이시"},
-    {cat:"food", ko:"매운 거 빼주세요.", vi:"Vui lòng không cho ớt.", en:"Please don’t add chili.", enPron:"플리즈 돈트 애드 칠리"},
-    {cat:"food", ko:"과일이 있습니까?", vi:"Có trái cây không?", en:"Do you have fruit?", enPron:"두 유 해브 프룻?"},
-    {cat:"food", ko:"채식 메뉴가 있습니까?", vi:"Có món chay không?", en:"Do you have vegetarian food?", enPron:"두 유 해브 베지테리언 푸드?"},
-    {cat:"food", ko:"포장해 주세요.", vi:"Cho tôi mang về, làm ơn.", en:"To go, please.", enPron:"투 고, 플리즈"},
-    {cat:"food", ko:"계산서 주세요.", vi:"Tính tiền, làm ơn.", en:"Bill, please.", enPron:"빌, 플리즈"},
-    {cat:"food", ko:"카드로 결제할 수 있나요?", vi:"Tôi có thể thanh toán bằng thẻ không?", en:"Can I pay by card?", enPron:"캔 아이 페이 바이 카드?"},
-    {cat:"food", ko:"고추장 있습니까?", vi:"Có gochujang không?", en:"Do you have gochujang?", enPron:"두 유 해브 고추장?"},
+    { cat: "교통", ko: "공항으로 가주세요.", vi: "Làm ơn đưa tôi đến sân bay.", en: "To the airport, please." },
+    { cat: "교통", ko: "호텔로 가주세요.", vi: "Làm ơn đưa tôi đến khách sạn.", en: "To the hotel, please." },
+    { cat: "교통", ko: "리조트로 가주세요.", vi: "Làm ơn đưa tôi đến khu nghỉ dưỡng.", en: "To the resort, please." },
+    { cat: "교통", ko: "어디로 가는 셔틀 버스인가요?", vi: "Xe buýt này đi đâu vậy?", en: "Where does this shuttle go?" },
+    { cat: "교통", ko: "여기서 내려주세요.", vi: "Cho tôi xuống ở đây.", en: "Drop me off here, please." },
+    { cat: "교통", ko: "천천히 가주세요.", vi: "Đi chậm thôi, làm ơn.", en: "Please go slowly." },
+    { cat: "교통", ko: "얼마나 걸리나요?", vi: "Mất bao lâu?", en: "How long will it take?" },
+    { cat: "교통", ko: "여기가 맞나요?", vi: "Chỗ này đúng không?", en: "Is this the right place?" },
+    { cat: "교통", ko: "정지해 주세요.", vi: "Dừng lại, làm ơn.", en: "Stop here, please." },
 
-    // 가격/결제
-    {cat:"money", ko:"얼마입니까?", vi:"Bao nhiêu tiền?", en:"How much is it?", enPron:"하우 머치 이즈 잇?"},
-    {cat:"money", ko:"좀 깎아주실 수 있나요?", vi:"Bạn có thể giảm giá một chút không?", en:"Can you give me a discount?", enPron:"캔 유 기브 미 어 디스카운트?"},
-    {cat:"money", ko:"이거 2개 주세요.", vi:"Cho tôi 2 cái này.", en:"Two of these, please.", enPron:"투 오브 디즈, 플리즈"},
-    {cat:"money", ko:"영수증 주세요.", vi:"Cho tôi xin hóa đơn.", en:"Please give me a receipt.", enPron:"플리즈 기브 미 어 리싯"},
-    {cat:"money", ko:"현금으로 결제할게요.", vi:"Tôi sẽ trả bằng tiền mặt.", en:"I will pay in cash.", enPron:"아이 윌 페이 인 캐시"},
-    {cat:"money", ko:"카드로 결제할게요.", vi:"Tôi sẽ trả bằng thẻ.", en:"I will pay by card.", enPron:"아이 윌 페이 바이 카드"},
+    { cat: "식당", ko: "메뉴판 주세요.", vi: "Cho tôi xem thực đơn.", en: "Menu, please." },
+    { cat: "식당", ko: "주문하겠습니다.", vi: "Tôi muốn gọi món.", en: "I'd like to order." },
+    { cat: "식당", ko: "고수는 빼주세요.", vi: "Vui lòng không cho rau mùi.", en: "No cilantro, please." },
+    { cat: "식당", ko: "덜 맵게 해주세요.", vi: "Làm ít cay thôi.", en: "Less spicy, please." },
+    { cat: "식당", ko: "매운 거 빼주세요.", vi: "Vui lòng không cho ớt.", en: "No chili, please." },
+    { cat: "식당", ko: "포장해 주세요.", vi: "Cho tôi mang về.", en: "To go, please." },
+    { cat: "식당", ko: "계산서 주세요.", vi: "Tính tiền, làm ơn.", en: "Bill, please." },
+    { cat: "식당", ko: "물 주세요.", vi: "Cho tôi nước.", en: "Water, please." },
+    { cat: "식당", ko: "콜라 주세요.", vi: "Cho tôi Coca.", en: "Coke, please." },
+    { cat: "식당", ko: "카드 결제할 수 있나요?", vi: "Thanh toán bằng thẻ được không?", en: "Can I pay by card?" },
+    { cat: "식당", ko: "고추장 주세요.", vi: "Cho tôi xin tương ớt Gochujang.", en: "Gochujang, please." },
+    { cat: "식당", ko: "마늘 주세요.", vi: "Cho tôi xin tỏi.", en: "Garlic, please." },
 
-    // 긴급
-    {cat:"help", ko:"도와주세요!", vi:"Giúp tôi với!", en:"Help me!", enPron:"헬프 미!"},
-    {cat:"help", ko:"길을 잃었습니다.", vi:"Tôi bị lạc.", en:"I’m lost.", enPron:"아임 로스트"},
-    {cat:"help", ko:"경찰을 불러주세요.", vi:"Gọi cảnh sát giúp tôi.", en:"Please call the police.", enPron:"플리즈 콜 더 폴리스"},
-    {cat:"help", ko:"병원에 가야 합니다.", vi:"Tôi cần đến bệnh viện.", en:"I need to go to the hospital.", enPron:"아이 니드 투 고 투 더 하스피털"},
-    {cat:"help", ko:"약국은 어디입니까?", vi:"Nhà thuốc ở đâu?", en:"Where is the pharmacy?", enPron:"웨어 이즈 더 파머시?"},
-    {cat:"help", ko:"휴대폰을 잃어버렸습니다.", vi:"Tôi bị mất điện thoại.", en:"I lost my phone.", enPron:"아이 로스트 마이 폰"}
+    { cat: "결제", ko: "얼마예요?", vi: "Bao nhiêu tiền?", en: "How much is it?" },
+    { cat: "결제", ko: "좀 깎아주실 수 있나요?", vi: "Giảm giá một chút được không?", en: "Can I get a discount?" },
+    { cat: "결제", ko: "이거 주세요.", vi: "Cho tôi cái này.", en: "I'll take this one." },
+    { cat: "결제", ko: "영수증 주세요.", vi: "Cho tôi hóa đơn.", en: "Receipt, please." },
+    { cat: "결제", ko: "카드로 결제할게요.", vi: "Tôi trả bằng thẻ.", en: "I will pay by card." },
+    { cat: "결제", ko: "현금으로 결제할게요.", vi: "Tôi trả bằng tiền mặt.", en: "I will pay in cash." },
+
+    { cat: "긴급", ko: "도와주세요.", vi: "Giúp tôi với.", en: "Help me." },
+    { cat: "긴급", ko: "잠시 빌려줄 수 있나요?", vi: "Tôi có thể mượn nó một lát không?", en: "Can I borrow this?" },
+    { cat: "긴급", ko: "길을 잃었습니다.", vi: "Tôi bị lạc đường.", en: "I am lost." },
+    { cat: "긴급", ko: "경찰을 불러주세요.", vi: "Gọi cảnh sát giúp tôi.", en: "Call the police, please." },
+    { cat: "긴급", ko: "병원에 가야합니다.", vi: "Tôi cần đi bệnh viện.", en: "I need to go to the hospital." },
+    { cat: "긴급", ko: "구급차를 불러주세요.", vi: "Gọi xe cấp cứu giúp tôi.", en: "Call an ambulance." },
+    { cat: "긴급", ko: "약국은 어디입니까?", vi: "Nhà thuốc ở đâu?", en: "Where is the pharmacy?" },
+    { cat: "긴급", ko: "휴대폰을 잃어버렸습니다.", vi: "Tôi bị mất điện thoại.", en: "I lost my phone." },
+    { cat: "긴급", ko: "지갑을 잃어버렸습니다.", vi: "Tôi bị mất ví.", en: "I lost my wallet." }
   ];
 
-  // ---- State ----
-  const LS_FAV = "vn_btn_fav_v3";
-  const LS_CAT = "vn_btn_cat_v3";
+  let currentCat = "인사/기본";
+  let deferredPrompt;
 
-  let favorites = new Set(JSON.parse(localStorage.getItem(LS_FAV) || "[]"));
-  let selectedCat = localStorage.getItem(LS_CAT) || "greet";
+  function render() {
+    const tabBar = document.getElementById('tabBar');
+    tabBar.innerHTML = CATEGORIES.map(c => `
+      <button class="tab-btn ${c.id === currentCat ? 'active' : ''}" onclick="setCat('${c.id}')">
+        <span>${c.emoji}</span> ${c.id}
+      </button>
+    `).join('');
 
-  // ---- UI refs ----
-  const tabsEl = $("tabs");
-  const gridEl = $("grid");
-  const overlayEl = $("overlay");
-  const modalCat = $("modalCat");
-  const closeModal = $("closeModal");
-  const toggleFavBtn = $("toggleFav");
-  const speakViBtn = $("speakVi");
-  const fullscreenBtn = $("fullscreen");
-  const ttsNote = $("ttsNote");
-  const toastEl = $("toast");
+    const keyGrid = document.getElementById('keywordGrid');
+    keyGrid.innerHTML = (KEYWORDS[currentCat] || []).map(k => `
+      <button class="keyword-btn" onclick="openModalRaw('${k.ko}', '${k.vi}', '${k.en}')">${k.ko}</button>
+    `).join('');
 
-  const mKo = $("mKo");
-  const mVi = $("mVi");
-  const mEnPron = $("mEnPron");
-  const mEn = $("mEn");
-
-  const photoTranslateBtn = $("photoTranslateBtn");
-
-  let currentIdx = -1;
-
-  function vibrate(ms=20){
-    if (navigator.vibrate) navigator.vibrate(ms);
+    const list = document.getElementById('phraseList');
+    list.innerHTML = DATA.filter(d => d.cat === currentCat).map((d) => {
+      const idx = DATA.indexOf(d);
+      return `<div class="phrase-item" onclick="openModal(${idx})"><span class="ko-txt">${d.ko}</span><span class="vi-hint">${d.vi}</span></div>`;
+    }).join('');
   }
 
-  function toast(msg){
-    toastEl.textContent = msg;
-    toastEl.classList.add("show");
-    setTimeout(()=>toastEl.classList.remove("show"), 1200);
+  function setCat(c) { currentCat = c; render(); window.scrollTo(0,0); }
+
+  function openModal(idx) {
+    const item = DATA[idx];
+    openModalRaw(item.ko, item.vi, item.en);
   }
 
-  function isFav(idx){ return favorites.has(String(idx)); }
-
-  function toggleFav(idx){
-    const key = String(idx);
-    if (favorites.has(key)) favorites.delete(key);
-    else favorites.add(key);
-    localStorage.setItem(LS_FAV, JSON.stringify([...favorites]));
+  function openModalRaw(ko, vi, en) {
+    document.getElementById('targetKo').innerText = ko;
+    document.getElementById('targetVi').innerText = vi;
+    document.getElementById('targetEn').innerText = en;
+    document.getElementById('modalOverlay').classList.add('open');
+    if (navigator.vibrate) navigator.vibrate(50);
   }
 
-  function renderTabs(){
-    tabsEl.innerHTML = "";
-    for (const c of CATS){
-      const btn = document.createElement("button");
-      btn.className = "tab" + ((c.key===selectedCat) ? " active" : "");
-      btn.type = "button";
-      btn.textContent = `${c.icon} ${c.name}`;
-      btn.onclick = () => {
-        vibrate();
-        selectedCat = c.key;
-        localStorage.setItem(LS_CAT, selectedCat);
-        renderTabs();
-        renderGrid();
-      };
-      tabsEl.appendChild(btn);
-    }
-  }
+  function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
 
-  function getVisibleItems(){
-    if (selectedCat === "fav"){
-      const out = [];
-      PHRASES.forEach((p, i) => { if (isFav(i)) out.push({p, i}); });
-      return out;
-    }
-
-    const out = [];
-    PHRASES.forEach((p, i) => {
-      if (p.cat !== selectedCat) return;
-      out.push({p, i});
-    });
-    return out;
-  }
-
-  function renderGrid(){
-    const items = getVisibleItems();
-    gridEl.innerHTML = "";
-
-    if (items.length === 0){
-      const empty = document.createElement("div");
-      empty.className = "card";
-      empty.innerHTML = `
-        <div class="ko" style="font-size:18px;">표시할 문장이 없습니다.</div>
-        <div class="note" style="margin-top:8px;">• 다른 카테고리를 선택하거나, 별(⭐)을 눌러 즐겨찾기를 추가해보세요.</div>
-      `;
-      gridEl.appendChild(empty);
-      return;
-    }
-
-    for (const {p, i} of items){
-      const b = document.createElement("button");
-      b.className = "btn";
-      b.type = "button";
-      b.innerHTML = `
-        <div>${p.ko}</div>
-        <span class="hint">${p.vi}</span>
-        <div class="star" title="즐겨찾기">${isFav(i) ? "⭐" : "☆"}</div>
-      `;
-
-      b.onclick = (ev) => {
-        const starRect = b.querySelector(".star").getBoundingClientRect();
-        const x = ev.clientX, y = ev.clientY;
-        const isStarClick = x >= starRect.left && x <= starRect.right && y >= starRect.top && y <= starRect.bottom;
-
-        vibrate();
-        if (isStarClick){
-          toggleFav(i);
-          renderGrid();
-          toast(isFav(i) ? "즐겨찾기 추가" : "즐겨찾기 해제");
-          return;
-        }
-        openModal(i);
-      };
-
-      gridEl.appendChild(b);
-    }
-  }
-
-  function openModal(idx){
-    currentIdx = idx;
-    const p = PHRASES[idx];
-    modalCat.textContent = "카테고리: " + (CATS.find(c=>c.key===p.cat)?.name || p.cat);
-
-    mKo.textContent = p.ko;
-    mVi.textContent = p.vi;
-    mEnPron.textContent = "영어 발음: " + (p.enPron || "-");
-    mEn.textContent = p.en;
-
-    toggleFavBtn.textContent = (isFav(idx) ? "⭐ 즐겨찾기 해제" : "⭐ 즐겨찾기");
-
-    overlayEl.classList.add("show");
-    overlayEl.setAttribute("aria-hidden","false");
-
-    const voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
-    const hasTTS = !!window.speechSynthesis && voices.length > 0;
-    ttsNote.textContent = hasTTS
-      ? "🔊 안내: 기기에 베트남어 음성이 있으면 읽어줍니다. (기기/브라우저에 따라 안 될 수 있어요)"
-      : "🔊 안내: 이 기기에서 음성 읽기 기능이 제한될 수 있어요. (문장 표시는 정상 동작)";
-  }
-
-  function closeModalFn(){
-    overlayEl.classList.remove("show");
-    overlayEl.setAttribute("aria-hidden","true");
-    currentIdx = -1;
-    if (window.speechSynthesis) window.speechSynthesis.cancel();
-  }
-
-  closeModal.onclick = () => { vibrate(); closeModalFn(); };
-  overlayEl.addEventListener("click", (e) => {
-    if (e.target === overlayEl) { vibrate(); closeModalFn(); }
-  });
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && overlayEl.classList.contains("show")) closeModalFn();
+  // PWA 홈 화면 설치 로직
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('installBanner').style.display = 'block';
   });
 
-  toggleFavBtn.onclick = () => {
-    if (currentIdx < 0) return;
-    vibrate();
-    toggleFav(currentIdx);
-    toggleFavBtn.textContent = (isFav(currentIdx) ? "⭐ 즐겨찾기 해제" : "⭐ 즐겨찾기");
-    renderGrid();
-    toast(isFav(currentIdx) ? "즐겨찾기 추가" : "즐겨찾기 해제");
-  };
-
-  function pickVietnameseVoice(){
-    if (!window.speechSynthesis) return null;
-    const voices = window.speechSynthesis.getVoices();
-    return voices.find(v => (v.lang||"").toLowerCase().startsWith("vi"))
-      || voices.find(v => (v.name||"").toLowerCase().includes("vietnam"))
-      || null;
-  }
-
-  speakViBtn.onclick = () => {
-    if (currentIdx < 0) return;
-    vibrate();
-    if (!window.speechSynthesis) { toast("이 기기에서 TTS 불가"); return; }
-    const p = PHRASES[currentIdx];
-    window.speechSynthesis.cancel();
-
-    const u = new SpeechSynthesisUtterance(p.vi);
-    const v = pickVietnameseVoice();
-    if (v) u.voice = v;
-    u.lang = v?.lang || "vi-VN";
-    u.rate = 0.95; u.pitch = 1.0;
-
-    try{
-      window.speechSynthesis.speak(u);
-      toast("읽는 중…");
-    }catch{
-      toast("TTS 실패");
-    }
-  };
-
-  fullscreenBtn.onclick = async () => {
-    vibrate();
-    try{
-      if (!document.fullscreenElement) await document.documentElement.requestFullscreen();
-      else await document.exitFullscreen();
-    }catch{
-      // ignore
-    }
-  };
-
-  // 📷 구글 사진 번역 버튼 (요청 반영)
-  // - Google 번역 앱이 설치되어 있으면 즉시 앱을 열고
-  // - 없으면 Google 번역 플레이스토어로 이동
-  photoTranslateBtn.onclick = () => {
-    vibrate();
-
-    // Google Translate 패키지명
-    const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=com.google.android.apps.translate";
-    // Android intent: 앱 실행 시도
-    const INTENT_URL =
-      "intent://translate/#Intent;scheme=googletranslate;package=com.google.android.apps.translate;end";
-
-    // 1) 앱 실행 시도
-    // 2) 실패하면 일정 시간 후 플레이스토어로 폴백
-    let opened = false;
-
-    const start = Date.now();
-    const timer = setTimeout(() => {
-      if (!opened && (Date.now() - start) < 1800) {
-        window.location.href = PLAY_STORE_URL;
+  async function installApp() {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        document.getElementById('installBanner').style.display = 'none';
       }
-    }, 900);
-
-    // 앱으로 전환되면 페이지가 숨겨짐 → opened 처리
-    const onVis = () => {
-      if (document.hidden) {
-        opened = true;
-        clearTimeout(timer);
-        document.removeEventListener("visibilitychange", onVis);
-      }
-    };
-    document.addEventListener("visibilitychange", onVis);
-
-    // 인텐트 실행
-    window.location.href = INTENT_URL;
-  };
-
-  // voices load (Android)
-  if (window.speechSynthesis){
-    window.speechSynthesis.onvoiceschanged = () => {};
+      deferredPrompt = null;
+    }
   }
 
-  // 즐겨찾기 탭인데 비었으면 인사로
-  if (selectedCat === "fav" && favorites.size === 0) selectedCat = "greet";
-
-  renderTabs();
-  renderGrid();
-
-  // Service worker
-  if ("serviceWorker" in navigator){
-    window.addEventListener("load", async () => {
-      try{ await navigator.serviceWorker.register("./sw.js"); }catch(e){}
-    });
-  }
-})();
+  render();
 </script>
 </body>
 </html>
-
