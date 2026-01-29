@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>민수군 시니어 베트남 번역기</title>
-  <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22민수군번역기%22,%22short_name%22:%22번역기%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23FDFCF8%22,%22theme_color%22:%22%231e4d2b%22}">
+  <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22민수군번역기%22,%22short_name%22:%22번역기%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23FDFCF8%22,%22theme_color%22:%22%231e4d2b%22,%22icons%22:[{%22src%22:%22https://cdn-icons-png.flaticon.com/512/197/197473.png%22,%22sizes%22:%22512x512%22,%22type%22:%22image/png%22}]}">
   <style>
     :root {
       --bg: #FDFCF8; 
@@ -26,17 +26,17 @@
     .nav-tabs { 
       position: sticky; top: 0; z-index: 10; background: var(--card); 
       display: flex; 
-      flex-wrap: nowrap; /* 버튼이 아래로 떨어지지 않게 고정 */
-      overflow-x: auto; /* 가로 스크롤 활성화 */
-      -webkit-overflow-scrolling: touch; /* 모바일 부드러운 스크롤 */
+      flex-wrap: nowrap; 
+      overflow-x: auto; 
+      -webkit-overflow-scrolling: touch; 
       padding: 15px 10px; 
       gap: 12px; 
       border-bottom: 1px solid var(--border); 
     }
-    .nav-tabs::-webkit-scrollbar { display: none; } /* 스크롤바 숨기기 (깔끔하게) */
+    .nav-tabs::-webkit-scrollbar { display: none; } 
 
     .tab-btn { 
-      flex: 0 0 auto; /* 버튼 크기가 줄어들지 않게 함 */
+      flex: 0 0 auto; 
       padding: 14px 24px; 
       border-radius: 35px; 
       border: 2px solid var(--border); 
@@ -100,6 +100,17 @@
 </div>
 
 <script>
+  // 서비스 워커 등록 스크립트 추가
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').then(reg => {
+        console.log('Service Worker 등록 성공:', reg.scope);
+      }).catch(err => {
+        console.log('Service Worker 등록 실패:', err);
+      });
+    });
+  }
+
   const CATEGORIES = [
     { id: "인사/기본", emoji: "👋" },
     { id: "공항", emoji: "✈️" },
@@ -133,7 +144,7 @@
     { cat: "인사/기본", ko: "얼마입니까?", vi: "Bao nhiêu tiền?", en: "How much is it?" },
     { cat: "인사/기본", ko: "다시 한 번 말해 주세요.", vi: "Vui lòng nói lại.", en: "Please say it again." },
     { cat: "인사/기본", ko: "사진 찍어주실 수 있나요?", vi: "Chụp ảnh giúp tôi nhé?", en: "Could you take a photo?" },
-    { cat: "인사/기본", ko: "무료입니까?", vi: "Nó có miễn phí không?", en: "Is it free?" },
+    { cat: "인사/기본", ko: "무료입니까?", vi: "Nó có 무료 không?", en: "Is it free?" },
     { cat: "인사/기본", ko: "여기로 가고 싶습니다.", vi: "Tôi muốn đến chỗ này.", en: "I want to go here." },
     { cat: "인사/기본", ko: "빌릴 수 있나요?", vi: "Tôi có thể mượn nó không?", en: "Can I borrow this?" },
     { cat: "인사/기본", ko: "엘리베이터가 어디에 있나요?", vi: "Thang máy ở đâu?", en: "Where is the elevator?" },
@@ -143,7 +154,7 @@
     { cat: "공항", ko: "출국 심사장은 어디인가요?", vi: "Khu vực xuất cảnh ở đâu?", en: "Where is departure control?" },
     { cat: "공항", ko: "탑승구(게이트)에서 기다리고 싶습니다.", vi: "Tôi muốn chờ ở cửa khởi hành.", en: "I want to wait at the gate." },
     { cat: "공항", ko: "수하물 찾는 곳이 어디인가요?", vi: "Khu nhận hành lý ở đâu?", en: "Where is baggage claim?" },
-    { cat: "공항", ko: "여권 여기 있습니다.", vi: "Hộ chiếu của tôi đây.", en: "Here is my passport." },
+    { cat: "공항", ko: "여권 여기 있습니다.", vi: "Hộ chiếu의 tôi đây.", en: "Here is my passport." },
     { cat: "공항", ko: "비행기 티켓 여기 있습니다.", vi: "Vé máy bay의 tôi đây.", en: "Here is my ticket." },
     { cat: "공항", ko: "좌석을 변경하고 싶습니다.", vi: "Tôi muốn đổi chỗ ngồi.", en: "I'd like to change my seat." },
     { cat: "기내", ko: "좌석 번호를 확인해 주세요.", vi: "Kiểm tra số ghế giúp tôi.", en: "Please check my seat number." },
@@ -161,7 +172,7 @@
     { cat: "숙소", ko: "방 키가 작동하지 않습니다.", vi: "Thẻ phòng không hoạt động.", en: "The room key card doesn't work." },
     { cat: "숙소", ko: "에어컨이 작동하지 않습니다.", vi: "Máy lạnh không hoạt động.", en: "The air conditioner is broken." },
     { cat: "숙소", ko: "전등이 작동하지 않습니다.", vi: "Đèn không hoạt động.", en: "The light doesn't work." },
-    { cat: "숙소", ko: "룸서비스를 하고 싶습니다.", vi: "Tôi muốn gọi dịch vụ phòng.", en: "Room service, please." },
+    { cat: "숙소", ko: "룸서비스를 하고 싶습니다.", vi: "Tôi muốn gọi 서비스 phòng.", en: "Room service, please." },
     { cat: "숙소", ko: "방 청소를 부탁합니다.", vi: "Vui lòng dọn phòng giúp tôi.", en: "Please clean the room." },
     { cat: "숙소", ko: "수건을 교체해 주세요.", vi: "Làm ơn thay khăn tắm.", en: "Please change the towels." },
     { cat: "숙소", ko: "수건을 더 주세요.", vi: "Cho tôi thêm khăn tắm.", en: "More towels, please." },
@@ -189,7 +200,7 @@
     { cat: "식당", ko: "고추장 주세요.", vi: "Cho tôi xin tương ớt Gochujang.", en: "Gochujang, please." },
     { cat: "식당", ko: "마늘 주세요.", vi: "Cho tôi xin tỏi.", en: "Garlic, please." },
     { cat: "결제", ko: "얼마예요?", vi: "Bao nhiêu tiền?", en: "How much is it?" },
-    { cat: "결제", ko: "좀 깎아주실 수 있나요?", vi: "Giảm giá một chút được không?", en: "Can I get a discount?" },
+    { cat: "결제", ko: "좀 깎아주실 수 있나요?", vi: "Giảm giá 한 chút được không?", en: "Can I get a discount?" },
     { cat: "결제", ko: "이거 주세요.", vi: "Cho tôi cái này.", en: "I'll take this one." },
     { cat: "결제", ko: "영수증 주세요.", vi: "Cho tôi hóa đơn.", en: "Receipt, please." },
     { cat: "결제", ko: "카드로 결제할게요.", vi: "Tôi trả bằng thẻ.", en: "I will pay by card." },
