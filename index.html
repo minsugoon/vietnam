@@ -2,9 +2,9 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>민수군 시니어 베트남 번역기</title>
-  <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22민수군번역기%22,%22short_name%22:%22번역기%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23FDFCF8%22,%22theme_color%22:%22%231e4d2b%22,%22icons%22:[{%22src%22:%22https://cdn-icons-png.flaticon.com/512/197/197473.png%22,%22sizes%22:%22512x512%22,%22type%22:%22image/png%22}]}">
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover" />
+  <title>민수군 베트남 번역기</title>
+  <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22베트남번역기%22,%22short_name%22:%22번역기%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23FDFCF8%22,%22theme_color%22:%22%231e4d2b%22,%22icons%22:[{%22src%22:%22https://cdn-icons-png.flaticon.com/512/197/197473.png%22,%22sizes%22:%22512x512%22,%22type%22:%22image/png%22}]}">
   <style>
     :root {
       --bg: #FDFCF8; 
@@ -12,64 +12,56 @@
       --text: #1a1a1a;
       --muted: #666666;
       --accent: #1e4d2b; 
+      --emergency: #d32f2f;
       --border: #e0e0e0;
       --shadow: 0 4px 15px rgba(0,0,0,0.1);
     }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    body { margin: 0; font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); -webkit-user-select: none; }
+    body { margin: 0; font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); -webkit-user-select: none; overflow-x: hidden; }
     
     header { padding: 30px 20px 15px; background: var(--card); border-bottom: 2px solid var(--border); text-align: center; }
     .main-title { font-size: 28px; font-weight: 900; color: var(--accent); }
     .sub-title { font-size: 16px; color: var(--muted); margin-top: 8px; font-weight: 700; }
 
-    /* 모바일 가로 스크롤 핵심 수정부 */
     .nav-tabs { 
       position: sticky; top: 0; z-index: 10; background: var(--card); 
-      display: flex; 
-      flex-wrap: nowrap; 
-      overflow-x: auto; 
-      -webkit-overflow-scrolling: touch; 
-      padding: 15px 10px; 
-      gap: 12px; 
-      border-bottom: 1px solid var(--border); 
+      display: flex; flex-wrap: nowrap; overflow-x: scroll; 
+      -webkit-overflow-scrolling: touch; padding: 15px 12px; gap: 12px; border-bottom: 1px solid var(--border); 
+      width: 100%;
     }
-    .nav-tabs::-webkit-scrollbar { display: none; } 
+    .nav-tabs::-webkit-scrollbar { display: none; }
 
     .tab-btn { 
-      flex: 0 0 auto; 
-      padding: 14px 24px; 
-      border-radius: 35px; 
-      border: 2px solid var(--border); 
-      background: var(--card); 
-      font-size: 19px; 
-      font-weight: 800; 
-      color: var(--muted); 
-      display: flex; 
-      align-items: center; 
-      gap: 8px; 
+      flex: 0 0 auto; padding: 14px 24px; border-radius: 35px; border: 2px solid var(--border); 
+      background: var(--card); font-size: 19px; font-weight: 800; color: var(--muted); 
+      display: flex; align-items: center; gap: 8px; white-space: nowrap;
     }
     .tab-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
 
-    .keyword-section { padding: 15px 15px 0; background: var(--bg); }
-    .keyword-label { font-size: 15px; color: var(--accent); font-weight: 900; margin-bottom: 10px; display: block; }
+    .keyword-section { padding: 20px 15px 0; background: var(--bg); }
+    .keyword-label { font-size: 16px; color: var(--accent); font-weight: 900; margin-bottom: 12px; display: block; }
     .keyword-grid { display: flex; flex-wrap: wrap; gap: 10px; }
-    .keyword-btn { background: #e8f0e9; border: 2px solid var(--accent); color: var(--accent); padding: 12px 20px; border-radius: 15px; font-size: 19px; font-weight: 800; cursor: pointer; }
+    .keyword-btn { background: #e8f0e9; border: 2px solid var(--accent); color: var(--accent); padding: 12px 20px; border-radius: 15px; font-size: 20px; font-weight: 800; cursor: pointer; }
 
     main { padding: 15px; margin-bottom: 80px; }
     .phrase-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
-    .phrase-item { background: var(--card); border: 1px solid var(--border); padding: 25px 20px; border-radius: 20px; box-shadow: var(--shadow); cursor: pointer; }
-    .ko-txt { font-size: 22px; font-weight: 800; color: #000; display: block; margin-bottom: 6px; }
-    .vi-hint { font-size: 16px; color: var(--muted); font-weight: 600; }
+    
+    .emergency-item { border: 3px solid var(--emergency) !important; background: #fff5f5 !important; }
+    .emergency-item .ko-txt { color: var(--emergency) !important; }
 
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; flex-direction: column; justify-content: center; padding: 15px; z-index: 100; }
+    .phrase-item { background: var(--card); border: 1px solid var(--border); padding: 25px 20px; border-radius: 20px; box-shadow: var(--shadow); cursor: pointer; text-decoration: none; display: block; }
+    .ko-txt { font-size: 23px; font-weight: 800; color: #000; display: block; margin-bottom: 6px; }
+    .vi-hint { font-size: 17px; color: var(--muted); font-weight: 600; }
+
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.92); display: none; flex-direction: column; justify-content: center; padding: 15px; z-index: 100; }
     .modal-overlay.open { display: flex; }
-    .modal-body { background: white; border-radius: 30px; padding: 45px 20px; text-align: center; }
-    .vi-big { font-size: 55px; font-weight: 900; line-height: 1.1; color: #000; margin-bottom: 20px; word-break: keep-all; }
-    .en-mid { font-size: 24px; color: var(--accent); font-weight: 700; margin-bottom: 30px; }
-    .ko-mid { font-size: 22px; color: #666; border-top: 1px solid #eee; padding-top: 25px; font-weight: 800; }
-    .close-modal-btn { margin-top: 40px; background: #222; color: white; border: none; padding: 20px 0; border-radius: 45px; font-size: 24px; font-weight: 800; width: 100%; cursor: pointer; }
+    .modal-body { background: white; border-radius: 30px; padding: 50px 20px; text-align: center; }
+    .vi-big { font-size: 58px; font-weight: 900; line-height: 1.1; color: #000; margin-bottom: 25px; word-break: keep-all; }
+    .en-mid { font-size: 25px; color: var(--accent); font-weight: 700; margin-bottom: 35px; }
+    .ko-mid { font-size: 23px; color: #555; border-top: 1px solid #eee; padding-top: 30px; font-weight: 800; }
+    .close-modal-btn { margin-top: 40px; background: #222; color: white; border: none; padding: 22px 0; border-radius: 50px; font-size: 25px; font-weight: 800; width: 100%; cursor: pointer; }
 
-    #installBanner { position: fixed; bottom: 0; left: 0; right: 0; background: var(--accent); color: white; padding: 15px; text-align: center; font-weight: 800; display: none; z-index: 50; }
+    #installBanner { position: fixed; bottom: 0; left: 0; right: 0; background: var(--accent); color: white; padding: 18px; text-align: center; font-weight: 800; display: none; z-index: 50; }
   </style>
 </head>
 <body>
@@ -82,7 +74,7 @@
 <div class="nav-tabs" id="tabBar"></div>
 
 <div class="keyword-section">
-  <span class="keyword-label">📍 물건 보여주기 (단어)</span>
+  <span class="keyword-label">📍 물건을 보여줄 때 (단어)</span>
   <div class="keyword-grid" id="keywordGrid"></div>
 </div>
 
@@ -100,26 +92,16 @@
 </div>
 
 <script>
-  // 서비스 워커 등록 스크립트 추가
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js').then(reg => {
-        console.log('Service Worker 등록 성공:', reg.scope);
-      }).catch(err => {
-        console.log('Service Worker 등록 실패:', err);
-      });
+      navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW 실패:', err));
     });
   }
 
   const CATEGORIES = [
-    { id: "인사/기본", emoji: "👋" },
-    { id: "공항", emoji: "✈️" },
-    { id: "기내", emoji: "💺" },
-    { id: "숙소", emoji: "🏨" },
-    { id: "교통", emoji: "🚕" },
-    { id: "식당", emoji: "🍴" },
-    { id: "결제", emoji: "💳" },
-    { id: "긴급", emoji: "🆘" }
+    { id: "인사/기본", emoji: "👋" }, { id: "공항", emoji: "✈️" }, { id: "기내", emoji: "💺" },
+    { id: "숙소", emoji: "🏨" }, { id: "교통", emoji: "🚕" }, { id: "식당", emoji: "🍴" },
+    { id: "결제", emoji: "💳" }, { id: "긴급", emoji: "🆘" }
   ];
 
   const KEYWORDS = {
@@ -133,7 +115,16 @@
     "긴급": [{ko:"경찰", vi:"Cảnh sát", en:"Police"}, {ko:"병원", vi:"Bệnh viện", en:"Hospital"}, {ko:"약국", vi:"Nhà thuốc", en:"Pharmacy"}, {ko:"지갑", vi:"Ví", en:"Wallet"}, {ko:"휴대폰", vi:"Điện thoại", en:"Phone"}]
   };
 
-  const DATA = [
+  const EXTRA_EMERGENCY = [
+    { cat: "긴급", type: "tel", ko: "🚑 구급차를 불러주세요!", vi: "Gọi xe cấp cứu giúp tôi.", en: "Call an ambulance.", link: "tel:115" },
+    { cat: "긴급", type: "tel", ko: "☎️ 대사관(근무시간): 통화하기", vi: "+84-24-3771-0404", en: "Embassy (Day)", link: "tel:+842437710404" },
+    { cat: "긴급", type: "tel", ko: "🚨 대사관(긴급·24시): 통화하기", vi: "+84-90-402-6126", en: "Embassy (Emergency)", link: "tel:+84904026126" },
+    { cat: "긴급", type: "tel", ko: "📞 영사안전콜센터(24시): 통화하기", vi: "+82-2-3210-0404", en: "Consular Call Center", link: "tel:+82232100404" },
+    { cat: "긴급", type: "app", ko: "📱 해외안전여행 앱 설치", vi: "안드로이드 / 아이폰", en: "Safe Travel App", link: "https://play.google.com/store/apps/details?id=kr.go.mofa.safetravel" },
+    { cat: "긴급", type: "app", ko: "📱 영사안전콜센터 앱 설치", vi: "안드로이드 / 아이폰", en: "Consular Call App", link: "https://play.google.com/store/apps/details?id=kr.go.mofa.consul.callcenter" }
+  ];
+
+  const USER_DATA = [
     { cat: "인사/기본", ko: "안녕하세요.", vi: "Xin chào.", en: "Hello." },
     { cat: "인사/기본", ko: "반갑습니다.", vi: "Rất vui được gặp bạn.", en: "Nice to meet you." },
     { cat: "인사/기본", ko: "감사합니다.", vi: "Cảm ơn.", en: "Thank you." },
@@ -169,15 +160,18 @@
     { cat: "숙소", ko: "와이파이 비밀번호가 무엇인가요?", vi: "Mật khẩu Wi-Fi là gì?", en: "What is the Wi-Fi password?" },
     { cat: "숙소", ko: "침대를 변경하고 싶습니다.", vi: "Tôi muốn đổi giường.", en: "I'd like to change the bed." },
     { cat: "숙소", ko: "조식은 어디서 먹나요?", vi: "Ăn sáng ở đâu?", en: "Where is breakfast?" },
+    { cat: "숙소", ko: "식당은 어디로 가나요?", vi: "Nhà hàng ở đâu?", en: "Where is the restaurant?" },
+    { cat: "숙소", ko: "음료 코너는 어디로 가나요?", vi: "Khu vực đồ uống ở đâu?", en: "Where is the beverage corner?" },
+    { cat: "숙소", ko: "수영장은 어디로 가나요?", vi: "Hồ bơi ở đâu?", en: "Where is the swimming pool?" },
     { cat: "숙소", ko: "방 키가 작동하지 않습니다.", vi: "Thẻ phòng không hoạt động.", en: "The room key card doesn't work." },
     { cat: "숙소", ko: "에어컨이 작동하지 않습니다.", vi: "Máy lạnh không hoạt động.", en: "The air conditioner is broken." },
-    { cat: "숙소", ko: "전등이 작동하지 않습니다.", vi: "Đèn không hoạt động.", en: "The light doesn't work." },
+    { cat: "숙소", ko: "전등이 작동하지 않습니다.", vi: "Đèn không 활동하지 않습니다.", en: "The light doesn't work." },
     { cat: "숙소", ko: "룸서비스를 하고 싶습니다.", vi: "Tôi muốn gọi 서비스 phòng.", en: "Room service, please." },
     { cat: "숙소", ko: "방 청소를 부탁합니다.", vi: "Vui lòng dọn phòng giúp tôi.", en: "Please clean the room." },
     { cat: "숙소", ko: "수건을 교체해 주세요.", vi: "Làm ơn thay khăn tắm.", en: "Please change the towels." },
     { cat: "숙소", ko: "수건을 더 주세요.", vi: "Cho tôi thêm khăn tắm.", en: "More towels, please." },
     { cat: "숙소", ko: "셔틀 버스를 이용하고 싶습니다.", vi: "Tôi muốn đi xe đưa đón.", en: "I'd like to use the shuttle." },
-    { cat: "숙소", ko: "잠시 대여할 수 있나요?", vi: "Tôi có thể mượn nó 한 lát không?", en: "Can I borrow this for a moment?" },
+    { cat: "숙소", ko: "잠시 대여할 수 있나요?", vi: "Tôi có thể mượn 그것 한 lát không?", en: "Can I borrow this for a moment?" },
     { cat: "교통", ko: "공항으로 가주세요.", vi: "Làm ơn đưa tôi đến sân bay.", en: "To the airport, please." },
     { cat: "교통", ko: "호텔로 가주세요.", vi: "Làm ơn đưa tôi đến khách sạn.", en: "To the hotel, please." },
     { cat: "교통", ko: "리조트로 가주세요.", vi: "Làm ơn đưa tôi đến khu nghỉ dưỡng.", en: "To the resort, please." },
@@ -206,16 +200,17 @@
     { cat: "결제", ko: "카드로 결제할게요.", vi: "Tôi trả bằng thẻ.", en: "I will pay by card." },
     { cat: "결제", ko: "현금으로 결제할게요.", vi: "Tôi trả bằng tiền mặt.", en: "I will pay in cash." },
     { cat: "긴급", ko: "도와주세요.", vi: "Giúp tôi với.", en: "Help me." },
-    { cat: "긴급", ko: "잠시 빌려줄 수 있나요?", vi: "Tôi có thể mượn nó 한 lát không?", en: "Can I borrow this?" },
+    { cat: "긴급", ko: "잠시 빌려줄 수 있나요?", vi: "Tôi có thể mượn 그것 한 lát không?", en: "Can I borrow this?" },
     { cat: "긴급", ko: "길을 잃었습니다.", vi: "Tôi bị lạc đường.", en: "I am lost." },
     { cat: "긴급", ko: "경찰을 불러주세요.", vi: "Gọi cảnh sát giúp tôi.", en: "Call the police, please." },
-    { cat: "긴급", ko: "병원에 가야합니다.", vi: "Tôi cần đi bệnh viện.", en: "I need to go to the hospital." },
+    { cat: "긴급", ko: "병원에 가야합니다.", vi: "Tôi cần đi 병원.", en: "I need to go to the hospital." },
     { cat: "긴급", ko: "구급차를 불러주세요.", vi: "Gọi xe cấp cứu giúp tôi.", en: "Call an ambulance." },
     { cat: "긴급", ko: "약국은 어디입니까?", vi: "Nhà thuốc ở đâu?", en: "Where is the pharmacy?" },
     { cat: "긴급", ko: "휴대폰을 잃어버렸습니다.", vi: "Tôi bị mất điện thoại.", en: "I lost my phone." },
     { cat: "긴급", ko: "지갑을 잃어버렸습니다.", vi: "Tôi bị mất ví.", en: "I lost my wallet." }
   ];
 
+  const DATA = [...EXTRA_EMERGENCY, ...USER_DATA];
   let currentCat = "인사/기본";
   let deferredPrompt;
 
@@ -234,6 +229,12 @@
 
     const list = document.getElementById('phraseList');
     list.innerHTML = DATA.filter(d => d.cat === currentCat).map((d) => {
+      if (d.type === 'tel' || d.type === 'app') {
+        return `<a href="${d.link}" class="phrase-item emergency-item" ${d.type === 'app' ? 'target="_blank"' : ''}>
+                  <span class="ko-txt">${d.ko}</span>
+                  <span class="vi-hint">${d.vi}</span>
+                </a>`;
+      }
       const idx = DATA.indexOf(d);
       return `<div class="phrase-item" onclick="openModal(${idx})"><span class="ko-txt">${d.ko}</span><span class="vi-hint">${d.vi}</span></div>`;
     }).join('');
@@ -251,8 +252,7 @@
   function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
 
   window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
+    e.preventDefault(); deferredPrompt = e;
     document.getElementById('installBanner').style.display = 'block';
   });
 
