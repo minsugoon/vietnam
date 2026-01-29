@@ -22,26 +22,45 @@
     .main-title { font-size: 28px; font-weight: 900; color: var(--accent); }
     .sub-title { font-size: 16px; color: var(--muted); margin-top: 8px; font-weight: 700; }
 
-    /* 상황(카테고리) 탭 - 이모지 포함 */
-    .nav-tabs { position: sticky; top: 0; z-index: 10; background: var(--card); display: flex; overflow-x: auto; padding: 15px 10px; gap: 12px; border-bottom: 1px solid var(--border); }
-    .nav-tabs::-webkit-scrollbar { display: none; }
-    .tab-btn { flex: 0 0 auto; padding: 14px 24px; border-radius: 35px; border: 2px solid var(--border); background: var(--card); font-size: 19px; font-weight: 800; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+    /* 모바일 가로 스크롤 핵심 수정부 */
+    .nav-tabs { 
+      position: sticky; top: 0; z-index: 10; background: var(--card); 
+      display: flex; 
+      flex-wrap: nowrap; /* 버튼이 아래로 떨어지지 않게 고정 */
+      overflow-x: auto; /* 가로 스크롤 활성화 */
+      -webkit-overflow-scrolling: touch; /* 모바일 부드러운 스크롤 */
+      padding: 15px 10px; 
+      gap: 12px; 
+      border-bottom: 1px solid var(--border); 
+    }
+    .nav-tabs::-webkit-scrollbar { display: none; } /* 스크롤바 숨기기 (깔끔하게) */
+
+    .tab-btn { 
+      flex: 0 0 auto; /* 버튼 크기가 줄어들지 않게 함 */
+      padding: 14px 24px; 
+      border-radius: 35px; 
+      border: 2px solid var(--border); 
+      background: var(--card); 
+      font-size: 19px; 
+      font-weight: 800; 
+      color: var(--muted); 
+      display: flex; 
+      align-items: center; 
+      gap: 8px; 
+    }
     .tab-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
 
-    /* 핵심 단어(키워드) 구역 */
     .keyword-section { padding: 15px 15px 0; background: var(--bg); }
     .keyword-label { font-size: 15px; color: var(--accent); font-weight: 900; margin-bottom: 10px; display: block; }
     .keyword-grid { display: flex; flex-wrap: wrap; gap: 10px; }
     .keyword-btn { background: #e8f0e9; border: 2px solid var(--accent); color: var(--accent); padding: 12px 20px; border-radius: 15px; font-size: 19px; font-weight: 800; cursor: pointer; }
 
-    /* 표현 리스트 */
     main { padding: 15px; margin-bottom: 80px; }
     .phrase-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
     .phrase-item { background: var(--card); border: 1px solid var(--border); padding: 25px 20px; border-radius: 20px; box-shadow: var(--shadow); cursor: pointer; }
     .ko-txt { font-size: 22px; font-weight: 800; color: #000; display: block; margin-bottom: 6px; }
     .vi-hint { font-size: 16px; color: var(--muted); font-weight: 600; }
 
-    /* 모달 */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; flex-direction: column; justify-content: center; padding: 15px; z-index: 100; }
     .modal-overlay.open { display: flex; }
     .modal-body { background: white; border-radius: 30px; padding: 45px 20px; text-align: center; }
@@ -50,7 +69,6 @@
     .ko-mid { font-size: 22px; color: #666; border-top: 1px solid #eee; padding-top: 25px; font-weight: 800; }
     .close-modal-btn { margin-top: 40px; background: #222; color: white; border: none; padding: 20px 0; border-radius: 45px; font-size: 24px; font-weight: 800; width: 100%; cursor: pointer; }
 
-    /* 설치 안내 버튼 */
     #installBanner { position: fixed; bottom: 0; left: 0; right: 0; background: var(--accent); color: white; padding: 15px; text-align: center; font-weight: 800; display: none; z-index: 50; }
   </style>
 </head>
@@ -58,7 +76,7 @@
 
 <header>
   <div class="main-title">🇻🇳 베트남 여행 번역기</div>
-  <div class="sub-title">그림 버튼을 누르고 단어나 문장을 선택하세요</div>
+  <div class="sub-title">메뉴를 옆으로 밀어서 상황을 선택하세요</div>
 </header>
 
 <div class="nav-tabs" id="tabBar"></div>
@@ -82,7 +100,6 @@
 </div>
 
 <script>
-  // 카테고리 정보와 상황 이모지
   const CATEGORIES = [
     { id: "인사/기본", emoji: "👋" },
     { id: "공항", emoji: "✈️" },
@@ -94,7 +111,6 @@
     { id: "긴급", emoji: "🆘" }
   ];
 
-  // 상단 핵심 단어 (키워드) 데이터
   const KEYWORDS = {
     "인사/기본": [{ko:"화장실", vi:"Nhà vệ sinh", en:"Restroom"}, {ko:"엘리베이터", vi:"Thang máy", en:"Elevator"}, {ko:"지도", vi:"Bản đồ", en:"Map"}],
     "공항": [{ko:"여권", vi:"Hộ chiếu", en:"Passport"}, {ko:"수화물", vi:"Hành lý", en:"Baggage"}, {ko:"티켓", vi:"Vé", en:"Ticket"}, {ko:"좌석", vi:"Chỗ ngồi", en:"Seat"}, {ko:"게이트", vi:"Cổng", en:"Gate"}],
@@ -106,7 +122,6 @@
     "긴급": [{ko:"경찰", vi:"Cảnh sát", en:"Police"}, {ko:"병원", vi:"Bệnh viện", en:"Hospital"}, {ko:"약국", vi:"Nhà thuốc", en:"Pharmacy"}, {ko:"지갑", vi:"Ví", en:"Wallet"}, {ko:"휴대폰", vi:"Điện thoại", en:"Phone"}]
   };
 
-  // 요청하신 전체 DATA 통합 [cite: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
   const DATA = [
     { cat: "인사/기본", ko: "안녕하세요.", vi: "Xin chào.", en: "Hello." },
     { cat: "인사/기본", ko: "반갑습니다.", vi: "Rất vui được gặp bạn.", en: "Nice to meet you." },
@@ -122,17 +137,15 @@
     { cat: "인사/기본", ko: "여기로 가고 싶습니다.", vi: "Tôi muốn đến chỗ này.", en: "I want to go here." },
     { cat: "인사/기본", ko: "빌릴 수 있나요?", vi: "Tôi có thể mượn nó không?", en: "Can I borrow this?" },
     { cat: "인사/기본", ko: "엘리베이터가 어디에 있나요?", vi: "Thang máy ở đâu?", en: "Where is the elevator?" },
-
     { cat: "공항", ko: "탑승 수속(체크인)을 하고 싶습니다.", vi: "Tôi muốn làm thủ tục chuyến bay.", en: "I'd like to check-in." },
     { cat: "공항", ko: "보안 검색대는 어디인가요?", vi: "Khu vực kiểm tra an ninh ở đâu?", en: "Where is security?" },
     { cat: "공항", ko: "입국 심사장은 어디인가요?", vi: "Khu vực nhập cảnh ở đâu?", en: "Where is immigration?" },
     { cat: "공항", ko: "출국 심사장은 어디인가요?", vi: "Khu vực xuất cảnh ở đâu?", en: "Where is departure control?" },
     { cat: "공항", ko: "탑승구(게이트)에서 기다리고 싶습니다.", vi: "Tôi muốn chờ ở cửa khởi hành.", en: "I want to wait at the gate." },
     { cat: "공항", ko: "수하물 찾는 곳이 어디인가요?", vi: "Khu nhận hành lý ở đâu?", en: "Where is baggage claim?" },
-    { cat: "공항", ko: "여권 여기 있습니다.", vi: "Hộ chiếu의 tôi đây.", en: "Here is my passport." },
+    { cat: "공항", ko: "여권 여기 있습니다.", vi: "Hộ chiếu của tôi đây.", en: "Here is my passport." },
     { cat: "공항", ko: "비행기 티켓 여기 있습니다.", vi: "Vé máy bay의 tôi đây.", en: "Here is my ticket." },
     { cat: "공항", ko: "좌석을 변경하고 싶습니다.", vi: "Tôi muốn đổi chỗ ngồi.", en: "I'd like to change my seat." },
-
     { cat: "기내", ko: "좌석 번호를 확인해 주세요.", vi: "Kiểm tra số ghế giúp tôi.", en: "Please check my seat number." },
     { cat: "기내", ko: "기내식을 확인하고 싶습니다.", vi: "Tôi muốn kiểm tra suất ăn.", en: "I'd like to check the meal." },
     { cat: "기내", ko: "물 한 잔 주세요.", vi: "Cho tôi một ly nước.", en: "Water, please." },
@@ -140,7 +153,6 @@
     { cat: "기내", ko: "주스 한 잔 주세요.", vi: "Cho tôi 한 ly nước trái cây.", en: "Juice, please." },
     { cat: "기내", ko: "커피 한 잔 주세요.", vi: "Cho tôi 한 ly cà phê.", en: "Coffee, please." },
     { cat: "기내", ko: "몸이 너무 안 좋습니다. 도와주세요.", vi: "Tôi cảm thấy không khỏe. Giúp tôi.", en: "I feel sick. Help me." },
-
     { cat: "숙소", ko: "예약을 확인하고 싶습니다.", vi: "Tôi muốn xác nhận đặt phòng.", en: "I'd like to confirm my reservation." },
     { cat: "숙소", ko: "체크인을 하고 싶습니다.", vi: "Tôi muốn nhận phòng.", en: "I'd like to check-in." },
     { cat: "숙소", ko: "와이파이 비밀번호가 무엇인가요?", vi: "Mật khẩu Wi-Fi là gì?", en: "What is the Wi-Fi password?" },
@@ -154,8 +166,7 @@
     { cat: "숙소", ko: "수건을 교체해 주세요.", vi: "Làm ơn thay khăn tắm.", en: "Please change the towels." },
     { cat: "숙소", ko: "수건을 더 주세요.", vi: "Cho tôi thêm khăn tắm.", en: "More towels, please." },
     { cat: "숙소", ko: "셔틀 버스를 이용하고 싶습니다.", vi: "Tôi muốn đi xe đưa đón.", en: "I'd like to use the shuttle." },
-    { cat: "숙소", ko: "잠시 대여할 수 있나요?", vi: "Tôi có thể mượn nó một lát không?", en: "Can I borrow this for a moment?" },
-
+    { cat: "숙소", ko: "잠시 대여할 수 있나요?", vi: "Tôi có thể mượn nó 한 lát không?", en: "Can I borrow this for a moment?" },
     { cat: "교통", ko: "공항으로 가주세요.", vi: "Làm ơn đưa tôi đến sân bay.", en: "To the airport, please." },
     { cat: "교통", ko: "호텔로 가주세요.", vi: "Làm ơn đưa tôi đến khách sạn.", en: "To the hotel, please." },
     { cat: "교통", ko: "리조트로 가주세요.", vi: "Làm ơn đưa tôi đến khu nghỉ dưỡng.", en: "To the resort, please." },
@@ -165,7 +176,6 @@
     { cat: "교통", ko: "얼마나 걸리나요?", vi: "Mất bao lâu?", en: "How long will it take?" },
     { cat: "교통", ko: "여기가 맞나요?", vi: "Chỗ này đúng không?", en: "Is this the right place?" },
     { cat: "교통", ko: "정지해 주세요.", vi: "Dừng lại, làm ơn.", en: "Stop here, please." },
-
     { cat: "식당", ko: "메뉴판 주세요.", vi: "Cho tôi xem thực đơn.", en: "Menu, please." },
     { cat: "식당", ko: "주문하겠습니다.", vi: "Tôi muốn gọi món.", en: "I'd like to order." },
     { cat: "식당", ko: "고수는 빼주세요.", vi: "Vui lòng không cho rau mùi.", en: "No cilantro, please." },
@@ -178,16 +188,14 @@
     { cat: "식당", ko: "카드 결제할 수 있나요?", vi: "Thanh toán bằng thẻ được không?", en: "Can I pay by card?" },
     { cat: "식당", ko: "고추장 주세요.", vi: "Cho tôi xin tương ớt Gochujang.", en: "Gochujang, please." },
     { cat: "식당", ko: "마늘 주세요.", vi: "Cho tôi xin tỏi.", en: "Garlic, please." },
-
     { cat: "결제", ko: "얼마예요?", vi: "Bao nhiêu tiền?", en: "How much is it?" },
     { cat: "결제", ko: "좀 깎아주실 수 있나요?", vi: "Giảm giá một chút được không?", en: "Can I get a discount?" },
     { cat: "결제", ko: "이거 주세요.", vi: "Cho tôi cái này.", en: "I'll take this one." },
     { cat: "결제", ko: "영수증 주세요.", vi: "Cho tôi hóa đơn.", en: "Receipt, please." },
     { cat: "결제", ko: "카드로 결제할게요.", vi: "Tôi trả bằng thẻ.", en: "I will pay by card." },
     { cat: "결제", ko: "현금으로 결제할게요.", vi: "Tôi trả bằng tiền mặt.", en: "I will pay in cash." },
-
     { cat: "긴급", ko: "도와주세요.", vi: "Giúp tôi với.", en: "Help me." },
-    { cat: "긴급", ko: "잠시 빌려줄 수 있나요?", vi: "Tôi có thể mượn nó một lát không?", en: "Can I borrow this?" },
+    { cat: "긴급", ko: "잠시 빌려줄 수 있나요?", vi: "Tôi có thể mượn nó 한 lát không?", en: "Can I borrow this?" },
     { cat: "긴급", ko: "길을 잃었습니다.", vi: "Tôi bị lạc đường.", en: "I am lost." },
     { cat: "긴급", ko: "경찰을 불러주세요.", vi: "Gọi cảnh sát giúp tôi.", en: "Call the police, please." },
     { cat: "긴급", ko: "병원에 가야합니다.", vi: "Tôi cần đi bệnh viện.", en: "I need to go to the hospital." },
@@ -221,12 +229,7 @@
   }
 
   function setCat(c) { currentCat = c; render(); window.scrollTo(0,0); }
-
-  function openModal(idx) {
-    const item = DATA[idx];
-    openModalRaw(item.ko, item.vi, item.en);
-  }
-
+  function openModal(idx) { const item = DATA[idx]; openModalRaw(item.ko, item.vi, item.en); }
   function openModalRaw(ko, vi, en) {
     document.getElementById('targetKo').innerText = ko;
     document.getElementById('targetVi').innerText = vi;
@@ -234,10 +237,8 @@
     document.getElementById('modalOverlay').classList.add('open');
     if (navigator.vibrate) navigator.vibrate(50);
   }
-
   function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
 
-  // PWA 홈 화면 설치 로직
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
@@ -248,9 +249,7 @@
     if (deferredPrompt) {
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === 'accepted') {
-        document.getElementById('installBanner').style.display = 'none';
-      }
+      if (outcome === 'accepted') document.getElementById('installBanner').style.display = 'none';
       deferredPrompt = null;
     }
   }
